@@ -1,6 +1,7 @@
 use leptos::{error::Result, ev::SubmitEvent, *};
 use leptos_router::use_navigate;
 use crate::storage;
+use crate::hooks::auth::is_auth;
 
 async fn login(username: String, password: String) -> Result<()> {
     let res = reqwasm::http::Request::get("http://localhost:3000/")
@@ -35,14 +36,24 @@ pub fn Login() -> impl IntoView {
             }
         );
     };
-    view! {
-        <form on:submit=handle_submit>
-            <input type="text" placeholder="Username" node_ref=user_name/>
-            <input type="password" placeholder="Password" node_ref=password/>
-            <button type="submit">Login</button>
-        </form>
+    let navigate = use_navigate();
+    if is_auth() {
+        navigate("/home", Default::default());
+        view! { <></> }.into_view()
+    } else {
+        view! {
+            <form on:submit=handle_submit>
+                <input type="text" placeholder="Username" node_ref=user_name/>
+                <input type="password" placeholder="Password" node_ref=password/>
+                <button type="submit">Login</button>
+            </form>
+        }.into_view()
     }
 }
+
+
+
+
 
 
 
