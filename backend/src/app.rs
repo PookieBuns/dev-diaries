@@ -6,14 +6,16 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
 use tower_cookies::{CookieManagerLayer, Cookies};
+use tower_http::cors::{CorsLayer, Any};
 
 pub fn api_router() -> Router {
     Router::new()
-        .route("/", get(probe))
         .route("/cookies", get(read_cookies))
         .layer(middleware::from_fn(mw_require_auth))
+        .route("/", get(probe))
         .merge(users_router())
         .layer(CookieManagerLayer::new())
+        .layer(CorsLayer::new().allow_origin(Any))
         .fallback(not_found)
 }
 
