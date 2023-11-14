@@ -1,4 +1,4 @@
-use crate::hooks::auth::RequireAuth;
+use crate::wrappers::auth::RequireAuth;
 use crate::pages::home::Home;
 use crate::pages::login::Login;
 use leptos::*;

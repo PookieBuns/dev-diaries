@@ -1,5 +1,6 @@
-use crate::error::{Error, Result};
 use crate::routes::AUTH_TOKEN;
+use axum::http::StatusCode;
+use axum::response::IntoResponse;
 use axum::routing::post;
 use axum::{Json, Router};
 use serde::Deserialize;
@@ -16,9 +17,10 @@ struct LoginPayload {
     password: String,
 }
 
-async fn login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Value>> {
+async fn login(cookies: Cookies, payload: Json<LoginPayload>) -> impl IntoResponse {
+    println!("login: {:?}", payload);
     if payload.username != "user" || payload.password != "pass" {
-        return Err(Error::LoginFail);
+        return (StatusCode::UNAUTHORIZED, "Login failed").into_response();
     }
 
     let mut cookie = Cookie::new(AUTH_TOKEN, "test-token");
@@ -30,5 +32,5 @@ async fn login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json<Val
             "success": true,
         }
     }));
-    Ok(body)
+    (StatusCode::OK, body).into_response()
 }

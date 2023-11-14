@@ -6,7 +6,7 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
 use tower_cookies::{CookieManagerLayer, Cookies};
-use tower_http::cors::{CorsLayer, Any};
+use tower_http::cors::{Any, CorsLayer};
 
 pub fn api_router() -> Router {
     Router::new()
@@ -15,7 +15,7 @@ pub fn api_router() -> Router {
         .route("/", get(probe))
         .merge(users_router())
         .layer(CookieManagerLayer::new())
-        .layer(CorsLayer::new().allow_origin(Any))
+        .layer(CorsLayer::new().allow_origin(Any).allow_headers(Any))
         .fallback(not_found)
 }
 
