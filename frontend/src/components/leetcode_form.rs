@@ -1,7 +1,7 @@
 use leptos::*;
 
 #[component]
-pub fn LeetCodeForm() -> impl IntoView {
+pub fn LeetcodeForm() -> impl IntoView {
     view! {
         <div>
             <h1>"LeetCodeForm"</h1>
