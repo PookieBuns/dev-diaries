@@ -1,7 +1,6 @@
 use crate::wrappers::auth::get_claims;
 use leptos::*;
 use leptos_router::*;
-use std::collections::HashMap;
 use wasm_cookies;
 
 #[component]
@@ -11,10 +10,7 @@ pub fn Home() -> impl IntoView {
         let navigate = use_navigate();
         navigate("/login", Default::default());
     };
-    let claims = get_claims().unwrap_or(HashMap::new());
-    for (key, value) in &claims {
-        logging::log!("{}: {}", key, value);
-    }
+    let claims = get_claims().unwrap_or_default();
     let curr_time = chrono::Utc::now().timestamp();
     view! {
         <div>
@@ -25,10 +21,8 @@ pub fn Home() -> impl IntoView {
             <ul>
                 {claims
                     .into_iter()
-                    .map(|(key, value)| {
-                        view! { <li>{key} : {value.to_string()}</li> }
-                    })
-                    .collect::<Vec<_>>()}
+                    .map(|(k, v)| view! { <li>{k} : {v.to_string()}</li> })
+                    .collect_view()}
             </ul>
             <button on:click=logout>Logout</button>
         </div>
