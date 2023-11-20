@@ -15,10 +15,12 @@ pub fn Home() -> impl IntoView {
     for (key, value) in &claims {
         logging::log!("{}: {}", key, value);
     }
+    let curr_time = chrono::Utc::now().timestamp();
     view! {
         <div>
             <h1>Home</h1>
             <p>Welcome to the home page!</p>
+            <p>Current time: {curr_time}</p>
             <p>Here are your claims from your jwt:</p>
             <ul>
                 {claims

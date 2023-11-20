@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.31"
 jsonwebtoken = { git = "https://github.com/Keats/jsonwebtoken" }
 leptos = { version = "0.5.2", features = ["csr"] }
 leptos_router = { version = "0.5.2", features = ["csr"] }

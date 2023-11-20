@@ -9,6 +9,8 @@ use tower_cookies::Cookies;
 
 use crate::app::routes::AUTH_TOKEN;
 
+const EXPIRATION_TIME: i64 = 3600;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims {
     sub: String,
@@ -40,12 +42,12 @@ pub async fn login(username: &str, password: &str) -> Result<String> {
 
 pub fn generate_jwt(user_name: &str) -> Result<String> {
     let now = Utc::now().timestamp();
-    let one_hour_later = now + 3600;
+    let exp = now + EXPIRATION_TIME;
     let claims = Claims {
         sub: user_name.to_string(),
         name: user_name.to_string(),
         iat: now as usize,
-        exp: one_hour_later as usize,
+        exp: exp as usize,
     };
     let key = EncodingKey::from_secret(SECRET_KEY.as_ref());
     let header = Header::default();
@@ -59,3 +61,4 @@ pub fn decode_jwt(jwt: &str) -> Result<Claims> {
     let token = decode::<Claims>(jwt, &key, &validation)?;
     Ok(token.claims)
 }
+
