@@ -3,7 +3,7 @@ use thiserror::Error;
 use leptos_router::use_navigate;
 use crate::storage;
 use crate::wrappers::auth::is_auth;
-use crate::components::alert::Alert;
+use crate::components::Alert;
 use std::collections::HashMap;
 
 #[derive(Error, Debug)]
