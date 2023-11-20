@@ -6,7 +6,7 @@ use crate::wrappers::auth::is_auth;
 use crate::components::alert::Alert;
 use std::collections::HashMap;
 
-#[derive(Error, Debug, Clone)]
+#[derive(Error, Debug)]
 pub enum LoginError {
     #[error("login failed")]
     LoginFailed,
@@ -17,7 +17,7 @@ async fn login(username: String, password: String) -> Result<()> {
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post("http://localhost:3000/api/users/login")
+    let res = client.post("http://localhost:8081/api/users/login")
         .json(&map)
         .send()
         .await?;
@@ -26,11 +26,6 @@ async fn login(username: String, password: String) -> Result<()> {
         return Err(LoginError::LoginFailed.into());
     }
     logging::log!("response_code: {}", response_code);
-    let res_text = res.text().await?;
-
-    logging::log!("res: {}", res_text);
-    let local_storage = storage::get_local_storage()?;
-    local_storage.set_item("token", "123");
     Ok(())
 }
 
@@ -76,6 +71,7 @@ pub fn Login() -> impl IntoView {
         }.into_view()
     }
 }
+
 
 
 

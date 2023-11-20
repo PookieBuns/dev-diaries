@@ -1,10 +1,13 @@
-use crate::mw_auth::mw_require_auth;
-use crate::routes::users::router as users_router;
+mod auth;
+mod errors;
+mod routes;
+use auth::mw_require_auth;
 use axum::http::StatusCode;
 use axum::middleware;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
+use routes::users::router as users_router;
 use tower_cookies::{CookieManagerLayer, Cookies};
 use tower_http::cors::{Any, CorsLayer};
 
