@@ -7,7 +7,7 @@ use std::collections::HashMap;
 
 pub fn is_auth() -> bool {
     match get_claims() {
-        Some(claims) => true,
+        Some(_) => true,
         None => false,
     }
 }
