@@ -11,6 +11,8 @@ pkill -f trunk
 
 # Stop the database
 echo "Stopping database..."
+cd db
 docker-compose down
+cd ..
 
 echo "All processes stopped."
