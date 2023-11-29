@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Launch database
+echo "Starting database..."
+docker-compose up -d
 # Navigate to the backend directory and run cargo watch
 echo "Starting cargo watch in the backend..."
 cd backend
