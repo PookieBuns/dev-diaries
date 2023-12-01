@@ -1,9 +1,9 @@
-use backend::app::api_router;
+use backend::app;
 use std::net::SocketAddr;
 
 #[tokio::main]
 async fn main() {
-    let app = api_router();
+    let app = app::app().await;
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     println!("Listening on http://{}", addr);

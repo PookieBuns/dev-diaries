@@ -2,7 +2,8 @@ use crate::app::auth;
 use crate::app::auth::{decode_jwt, generate_jwt};
 use crate::app::errors::{Error, Result};
 use crate::app::routes::AUTH_TOKEN;
-use axum::extract::Query;
+use crate::app::AppState;
+use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -11,21 +12,22 @@ use serde::Deserialize;
 use serde_json::json;
 use tower_cookies::{Cookie, Cookies};
 
-pub fn router() -> Router {
+pub fn router() -> Router<AppState> {
     Router::new()
-        .route("/api/users/login", post(login))
-        .route("/api/users/jwt", get(jwt))
+        .route("/login", post(login))
+        .route("/jwt", get(jwt))
+        .route("/register", post(register))
 }
 
 #[derive(Deserialize, Debug)]
-struct LoginPayload {
+struct UserPayload {
     username: String,
     password: String,
 }
 
-async fn login(cookies: Cookies, Json(payload): Json<LoginPayload>) -> Result<impl IntoResponse> {
-    let jwt = auth::login(&payload.username, &payload.password).await?;
-
+async fn login(State(state): State<AppState>, cookies: Cookies, Json(payload): Json<UserPayload>) -> Result<impl IntoResponse> {
+    let db = &state.pool;
+    let jwt = auth::login(&payload.username, &payload.password, db).await?;
     let mut cookie = Cookie::new(AUTH_TOKEN, jwt.clone());
     cookie.set_path("/");
     cookies.add(cookie);
@@ -39,6 +41,18 @@ async fn login(cookies: Cookies, Json(payload): Json<LoginPayload>) -> Result<im
     Ok((StatusCode::OK, body))
 }
 
+async fn register(State(state): State<AppState>, Json(payload): Json<UserPayload>) -> Result<impl IntoResponse> {
+    // cloning the pool doesn't create a new pool
+    let db = &state.pool;
+    auth::register(&payload.username, &payload.password, db).await?;
+    let body = Json(json!({
+        "result": {
+            "success": true,
+        }
+    }));
+    Ok((StatusCode::OK, body))
+}
+
 #[derive(Deserialize, Debug)]
 struct QueryParams {
     username: String,
@@ -46,7 +60,7 @@ struct QueryParams {
 
 async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
     let username = params.username;
-    let token = generate_jwt(&username).unwrap();
+    let token = generate_jwt(&username, 0).unwrap();
     let res = decode_jwt(&token);
     match res {
         Ok(_) => println!("jwt: {:?}", res),
