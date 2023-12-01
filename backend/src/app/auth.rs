@@ -32,7 +32,7 @@ pub async fn mw_require_auth<B>(
 ) -> Result<Response> {
     let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
     println!("auth_token: {:?}", auth_token);
-    auth_token.ok_or(Error::AuthError)?;
+    auth_token.ok_or(Error::Auth)?;
     Ok(next.run(req).await)
 }
 
@@ -66,7 +66,7 @@ pub fn verify_password(password: &str, salt: &[u8], hash: &[u8]) -> bool {
         NonZeroU32::new(100_000).unwrap(),
         salt,
         password.as_bytes(),
-        &hash,
+        hash,
     );
     result.is_ok()
 }
@@ -86,9 +86,9 @@ pub async fn login(username: &str, password: &str, pool: &PgPool) -> Result<Stri
         .await?;
     println!("user: {:?}", user);
     if !verify_password(password, &user.password.salt, &user.password.hash) {
-        return Err(Error::AuthError);
+        return Err(Error::Auth);
     }
-    let jwt = generate_jwt(&username, user.user_id)?;
+    let jwt = generate_jwt(username, user.user_id)?;
     Ok(jwt)
 }
 

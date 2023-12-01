@@ -9,7 +9,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("auth error")]
-    AuthError,
+    Auth,
     #[error("unknown error")]
     Unknown,
 

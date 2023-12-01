@@ -6,10 +6,7 @@ use serde_json::Value;
 use std::collections::HashMap;
 
 pub fn is_auth() -> bool {
-    match get_claims() {
-        Some(_) => true,
-        None => false,
-    }
+    get_claims().is_some()
 }
 
 fn decode_jwt(token: &str) -> Result<HashMap<String, Value>> {
@@ -32,7 +29,6 @@ pub fn get_claims() -> Option<HashMap<String, Value>> {
             Err(_) => None,
         },
         None => None,
-
     }
 }
 
