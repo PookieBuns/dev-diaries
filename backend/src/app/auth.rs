@@ -36,12 +36,14 @@ pub async fn mw_require_auth<B>(
     Ok(next.run(req).await)
 }
 
-pub struct PasswordHash {
+#[derive(sqlx::FromRow, Debug)]
+struct PasswordHash {
     salt: [u8; digest::SHA256_OUTPUT_LEN],
+    #[sqlx(rename = "password_hash")]
     hash: [u8; digest::SHA256_OUTPUT_LEN],
 }
 
-pub fn hash_password(password: &str) -> Result<PasswordHash> {
+fn hash_password(password: &str) -> Result<PasswordHash> {
     const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN;
     let rng = rand::SystemRandom::new();
     let mut salt = [0u8; CREDENTIAL_LEN];
@@ -73,8 +75,8 @@ pub fn verify_password(password: &str, salt: &[u8], hash: &[u8]) -> bool {
 struct User {
     user_id: i32,
     // user_name: String,
-    password_hash: [u8; digest::SHA256_OUTPUT_LEN],
-    salt: [u8; digest::SHA256_OUTPUT_LEN],
+    #[sqlx(flatten)]
+    password: PasswordHash,
 }
 
 pub async fn login(username: &str, password: &str, pool: &PgPool) -> Result<String> {
@@ -82,7 +84,8 @@ pub async fn login(username: &str, password: &str, pool: &PgPool) -> Result<Stri
         .bind(username)
         .fetch_one(pool)
         .await?;
-    if !verify_password(password, &user.salt, &user.password_hash) {
+    println!("user: {:?}", user);
+    if !verify_password(password, &user.password.salt, &user.password.hash) {
         return Err(Error::AuthError);
     }
     let jwt = generate_jwt(&username, user.user_id)?;
