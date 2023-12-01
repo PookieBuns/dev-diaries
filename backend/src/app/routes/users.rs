@@ -60,7 +60,7 @@ struct QueryParams {
 
 async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
     let username = params.username;
-    let token = generate_jwt(&username, 0).unwrap();
+    let token = generate_jwt(&username, 0)?;
     let res = decode_jwt(&token);
     match res {
         Ok(_) => println!("jwt: {:?}", res),
