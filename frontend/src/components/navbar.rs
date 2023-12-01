@@ -10,9 +10,9 @@ pub fn Navbar() -> impl IntoView {
     };
     view! {
         <div class="navbar">
-            <a href="/home">Home</a>
-            <a href="/new">New Diary</a>
-            <a href="/">Dummy</a>
+            <A href="/home">Home</A>
+            <A href="/new">New Diary</A>
+            <A href="/">Dummy</A>
             <button on:click=logout>Logout</button>
         </div>
     }

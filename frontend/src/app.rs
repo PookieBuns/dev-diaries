@@ -1,4 +1,4 @@
-use crate::pages::{Home, Login, Create};
+use crate::pages::{Home, Login, Create, Register};
 use crate::wrappers::{Layout, RequireAuth};
 use leptos::*;
 use leptos_router::*;
@@ -17,6 +17,7 @@ pub fn App() -> impl IntoView {
                         </Route>
                     </Route>
                     <Route path="/login" view=Login/>
+                    <Route path="/register" view=Register/>
                     <Route path="/*any" view=|| view! { <h1>"Not Found"</h1> }/>
                 </Routes>
             </main>

@@ -6,31 +6,31 @@ use crate::components::Alert;
 use std::collections::HashMap;
 
 #[derive(Error, Debug)]
-pub enum LoginError {
-    #[error("login failed")]
-    LoginFailed,
+pub enum RegisterError {
+    #[error("register failed")]
+    RegisterFailed,
 }
 
-async fn login(username: String, password: String) -> Result<()> {
+async fn register(username: String, password: String) -> Result<()> {
     let mut map = HashMap::new();
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post("http://localhost:8081/api/users/login")
+    let res = client.post("http://localhost:8081/api/users/register")
         .json(&map)
         .send()
         .await?;
     let response_code = res.status();
     if !response_code.is_success() {
-        res.json().await?;
-        return Err(LoginError::LoginFailed.into());
+        res.json::<HashMap<String, String>>().await?;
+        return Err(RegisterError::RegisterFailed.into());
     }
     logging::log!("response_code: {}", response_code);
     Ok(())
 }
 
 #[component]
-pub fn Login() -> impl IntoView {
+pub fn Register() -> impl IntoView {
     use leptos::html::Input;
     let user_name: NodeRef<Input> = create_node_ref();
     let password: NodeRef<Input> = create_node_ref();
@@ -45,12 +45,12 @@ pub fn Login() -> impl IntoView {
         let navigate = use_navigate();
         spawn_local(
             async move {
-                if login(user_name_value, password_value).await.is_ok() {
-                    logging::log!("login success");
-                    navigate("/home", Default::default());
+                if register(user_name_value, password_value).await.is_ok() {
+                    logging::log!("register success");
+                    navigate("/login", Default::default());
                 } else {
-                    logging::log!("login failed");
-                    set_alert_message.set("login failed".to_string());
+                    logging::log!("register failed");
+                    set_alert_message.set("register failed".to_string());
                     set_alert_visible.set(true);
                 }
             }
@@ -66,13 +66,12 @@ pub fn Login() -> impl IntoView {
             <form on:submit=handle_submit>
                 <input required=true type="text" placeholder="Username" node_ref=user_name/>
                 <input required=true type="password" placeholder="Password" node_ref=password/>
-                <button type="submit">Login</button>
+                <button type="submit">Register</button>
             </form>
-            <A href="/register">Register</A>
+            <A href="/login">Login</A>
         }.into_view()
     }
 }
-
 
 
 
