@@ -6,7 +6,8 @@ fn database_url() -> String {
     url.set_host(Some("localhost")).expect("host is not valid");
     url.set_port(Some(5432)).expect("port is not valid");
     url.set_username("user").expect("username is not valid");
-    url.set_password(Some("password")).expect("password is not valid");
+    url.set_password(Some("password"))
+        .expect("password is not valid");
     url.set_path("/postgres");
     url.into()
 }

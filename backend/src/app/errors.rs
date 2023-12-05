@@ -20,6 +20,12 @@ pub enum Error {
     SqlxError(#[from] sqlx::Error),
     #[error("ring error: {0}")]
     RingError(#[from] ring::error::Unspecified),
+    #[error("mail error: {0}")]
+    MailError(#[from] lettre::error::Error),
+    #[error("address error: {0}")]
+    AddressError(#[from] lettre::address::AddressError),
+    #[error("smtp error: {0}")]
+    SmtpError(#[from] lettre::transport::smtp::Error),
 }
 
 impl IntoResponse for Error {

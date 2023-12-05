@@ -1,7 +1,6 @@
-use crate::app::auth;
-use crate::app::auth::{decode_jwt, generate_jwt};
 use crate::app::errors::{Error, Result};
 use crate::app::routes::AUTH_TOKEN;
+use crate::app::service::user_service::{decode_jwt, generate_jwt};
 use crate::app::AppState;
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
@@ -17,6 +16,9 @@ pub fn router() -> Router<AppState> {
         .route("/login", post(login))
         .route("/jwt", get(jwt))
         .route("/register", post(register))
+        .route("/password-reset", post(get_password_reset_token))
+        .route("/password-reset/:token", post(reset_password))
+        .route("/test", get(test))
 }
 
 #[derive(Deserialize, Debug)]
@@ -25,9 +27,15 @@ struct UserPayload {
     password: String,
 }
 
-async fn login(State(state): State<AppState>, cookies: Cookies, Json(payload): Json<UserPayload>) -> Result<impl IntoResponse> {
-    let db = &state.pool;
-    let jwt = auth::login(&payload.username, &payload.password, db).await?;
+async fn login(
+    State(state): State<AppState>,
+    cookies: Cookies,
+    Json(payload): Json<UserPayload>,
+) -> Result<impl IntoResponse> {
+    let user_service = &state.user_service;
+    let jwt = user_service
+        .login(&payload.username, &payload.password)
+        .await?;
     let mut cookie = Cookie::new(AUTH_TOKEN, jwt.clone());
     cookie.set_path("/");
     cookies.add(cookie);
@@ -41,10 +49,15 @@ async fn login(State(state): State<AppState>, cookies: Cookies, Json(payload): J
     Ok((StatusCode::OK, body))
 }
 
-async fn register(State(state): State<AppState>, Json(payload): Json<UserPayload>) -> Result<impl IntoResponse> {
+async fn register(
+    State(state): State<AppState>,
+    Json(payload): Json<UserPayload>,
+) -> Result<impl IntoResponse> {
     // cloning the pool doesn't create a new pool
-    let db = &state.pool;
-    auth::register(&payload.username, &payload.password, db).await?;
+    let user_service = &state.user_service;
+    user_service
+        .register(&payload.username, &payload.password)
+        .await?;
     let body = Json(json!({
         "result": {
             "success": true,
@@ -82,4 +95,17 @@ async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
         }
     }));
     Ok((StatusCode::OK, body))
+}
+
+async fn get_password_reset_token() -> Result<impl IntoResponse> {
+    Ok("todo")
+}
+
+async fn reset_password() -> Result<impl IntoResponse> {
+    Ok("todo")
+}
+
+async fn test() -> Result<impl IntoResponse> {
+    use crate::app::password_recovery::send_email;
+    Ok("success")
 }
