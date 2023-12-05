@@ -1,5 +1,5 @@
-use crate::auth::mw_require_auth;
 use crate::db;
+use crate::middleware::mw_require_auth;
 use crate::repository::user_repository::PgUserRepo;
 use crate::routes::users::router as users_router;
 use crate::service::UserService;

@@ -1,7 +1,6 @@
 use crate::app::AppState;
+use crate::auth::AUTH_TOKEN;
 use crate::errors::{Error, Result};
-use crate::routes::AUTH_TOKEN;
-use crate::service::user_service::{decode_jwt, generate_jwt};
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
@@ -72,6 +71,7 @@ struct QueryParams {
 }
 
 async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
+    use crate::auth::{decode_jwt, generate_jwt};
     let username = params.username;
     let token = generate_jwt(&username, 0)?;
     let res = decode_jwt(&token);
@@ -106,6 +106,5 @@ async fn reset_password() -> Result<impl IntoResponse> {
 }
 
 async fn test() -> Result<impl IntoResponse> {
-    use crate::password_recovery::send_email;
     Ok("success")
 }

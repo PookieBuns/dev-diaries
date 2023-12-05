@@ -7,5 +7,6 @@ mod password_recovery;
 mod repository;
 mod routes;
 mod service;
+mod middleware;
 
 pub use errors::Result;
