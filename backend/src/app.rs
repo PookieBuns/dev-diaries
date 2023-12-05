@@ -1,22 +1,13 @@
-mod auth;
-mod db;
-mod errors;
-mod model;
-mod password_recovery;
-mod repository;
-mod routes;
-mod service;
-
-use crate::app::repository::user_repository::PgUserRepo;
-use crate::app::service::UserService;
-use auth::mw_require_auth;
+use crate::auth::mw_require_auth;
+use crate::db;
+use crate::repository::user_repository::PgUserRepo;
+use crate::routes::users::router as users_router;
+use crate::service::UserService;
 use axum::http::StatusCode;
 use axum::middleware;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::Router;
-pub use errors::Result;
-use routes::users::router as users_router;
 use tower_cookies::{CookieManagerLayer, Cookies};
 use tower_http::cors::{Any, CorsLayer};
 
@@ -24,8 +15,8 @@ use tower_http::cors::{Any, CorsLayer};
 type UserRepoImpl = PgUserRepo;
 
 #[derive(Clone)]
-struct AppState {
-    user_service: UserService<UserRepoImpl>,
+pub struct AppState {
+    pub user_service: UserService<UserRepoImpl>,
 }
 
 fn api_router() -> Router<AppState> {

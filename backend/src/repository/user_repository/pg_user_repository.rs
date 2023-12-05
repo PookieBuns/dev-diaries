@@ -1,6 +1,6 @@
 use super::UserRepo;
-use crate::app::model::User;
-use crate::app::Result;
+use crate::model::User;
+use crate::Result;
 use axum::async_trait;
 use sqlx::PgPool;
 

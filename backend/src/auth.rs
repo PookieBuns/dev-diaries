@@ -1,10 +1,11 @@
-use crate::app::errors::{Error, Result};
+use crate::errors::Error;
+use crate::Result;
 use axum::http::Request;
 use axum::middleware::Next;
 use axum::response::Response;
 use tower_cookies::Cookies;
 
-use crate::app::routes::AUTH_TOKEN;
+use crate::routes::AUTH_TOKEN;
 
 pub async fn mw_require_auth<B>(
     cookies: Cookies,

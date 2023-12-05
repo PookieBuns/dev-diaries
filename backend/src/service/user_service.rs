@@ -1,8 +1,8 @@
-use crate::app::errors::Error;
-use crate::app::model::PasswordHash;
-use crate::app::model::User;
-use crate::app::repository::user_repository::UserRepo;
-use crate::app::Result;
+use crate::errors::Error;
+use crate::model::PasswordHash;
+use crate::model::User;
+use crate::repository::user_repository::UserRepo;
+use crate::Result;
 use chrono::Utc;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use ring::rand::SecureRandom;

@@ -1,6 +1,7 @@
-use crate::app::errors::Result;
+use crate::Result;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use url::Url;
+
 fn database_url() -> String {
     let mut url = Url::parse("postgres://").unwrap();
     url.set_host(Some("localhost")).expect("host is not valid");

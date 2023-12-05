@@ -1,7 +1,7 @@
-use crate::app::errors::{Error, Result};
-use crate::app::routes::AUTH_TOKEN;
-use crate::app::service::user_service::{decode_jwt, generate_jwt};
 use crate::app::AppState;
+use crate::errors::{Error, Result};
+use crate::routes::AUTH_TOKEN;
+use crate::service::user_service::{decode_jwt, generate_jwt};
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
@@ -106,6 +106,6 @@ async fn reset_password() -> Result<impl IntoResponse> {
 }
 
 async fn test() -> Result<impl IntoResponse> {
-    use crate::app::password_recovery::send_email;
+    use crate::password_recovery::send_email;
     Ok("success")
 }

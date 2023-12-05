@@ -1,4 +1,4 @@
-use crate::app::errors::Result;
+use crate::Result;
 use lettre::message::Mailbox;
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
@@ -19,9 +19,7 @@ pub fn send_email(email_address: &str, subject: &str, body: &str) -> Result<()> 
 
     let creds = Credentials::new(EMAIL_USERNAME.to_string(), EMAIL_PASSWORD.to_string());
 
-    let mailer = SmtpTransport::relay(SMTP_HOST)?
-        .credentials(creds)
-        .build();
+    let mailer = SmtpTransport::relay(SMTP_HOST)?.credentials(creds).build();
 
     mailer.send(&email)?;
     Ok(())

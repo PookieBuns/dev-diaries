@@ -1,4 +1,4 @@
 mod user;
 
-pub use user::User;
 pub use user::PasswordHash;
+pub use user::User;
