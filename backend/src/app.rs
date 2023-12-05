@@ -28,7 +28,7 @@ fn api_router() -> Router<AppState> {
 
 pub async fn app() -> Router {
     let pool = db::db_pool().await.unwrap();
-    let user_repo = UserRepoImpl::new(pool.clone());
+    let user_repo = UserRepoImpl::new(pool);
     let user_service = UserService::new(user_repo);
     let app_state = AppState { user_service };
     Router::new()
