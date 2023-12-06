@@ -1,7 +1,7 @@
 use crate::app::AppState;
 use crate::auth::AUTH_TOKEN;
 use crate::errors::{Error, Result};
-use axum::extract::{Query, State};
+use axum::extract::{Path, Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
@@ -15,8 +15,8 @@ pub fn router() -> Router<AppState> {
         .route("/login", post(login))
         .route("/jwt", get(jwt))
         .route("/register", post(register))
-        .route("/password-reset", post(get_password_reset_token))
-        .route("/password-reset/:token", post(reset_password))
+        .route("/password-reset", get(get_password_reset_token))
+        .route("/password-reset/:token", get(verify_password_reset))
         .route("/test", get(test))
 }
 
@@ -97,12 +97,34 @@ async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
     Ok((StatusCode::OK, body))
 }
 
-async fn get_password_reset_token() -> Result<impl IntoResponse> {
-    Ok("todo")
+async fn get_password_reset_token(
+    State(state): State<AppState>,
+    Query(payload): Query<UserPayload>,
+) -> Result<impl IntoResponse> {
+    let user_service = &state.user_service;
+    user_service
+        .request_password_reset(&payload.username)
+        .await?;
+    let body = Json(json!({
+        "result": {
+            "success": true,
+        }
+    }));
+    Ok((StatusCode::OK, body))
 }
 
-async fn reset_password() -> Result<impl IntoResponse> {
-    Ok("todo")
+async fn verify_password_reset(
+    State(state): State<AppState>,
+    Path(token): Path<String>,
+) -> Result<impl IntoResponse> {
+    let user_service = &state.user_service;
+    user_service.verify_password_reset(&token).await?;
+    let body = Json(json!({
+        "result": {
+            "success": true,
+        }
+    }));
+    Ok((StatusCode::OK, body))
 }
 
 async fn test() -> Result<impl IntoResponse> {

@@ -1,25 +1,30 @@
+use crate::auth::{decode_jwt, generate_jwt, hash_password, verify_password};
 use crate::errors::Error;
 use crate::model::User;
+use crate::repository::token_repository::TokenRepo;
 use crate::repository::user_repository::UserRepo;
 use crate::Result;
-use crate::auth::{hash_password, verify_password, generate_jwt};
-
-
 
 #[derive(Clone)]
-pub struct UserService<T>
+pub struct UserService<T, U>
 where
     T: UserRepo,
+    U: TokenRepo,
 {
     user_repository: T,
+    token_repository: U,
 }
 
-impl<T> UserService<T>
+impl<T, U> UserService<T, U>
 where
     T: UserRepo,
+    U: TokenRepo,
 {
-    pub fn new(user_repository: T) -> Self {
-        Self { user_repository }
+    pub fn new(user_repository: T, token_repository: U) -> Self {
+        Self {
+            user_repository,
+            token_repository,
+        }
     }
 
     pub async fn register(&self, username: &str, password: &str) -> Result<()> {
@@ -40,5 +45,19 @@ where
         }
         let jwt = generate_jwt(&user.user_name, user.user_id.unwrap())?;
         Ok(jwt)
+    }
+
+    pub async fn request_password_reset(&self, username: &str) -> Result<()> {
+        let user = self.user_repository.find_by_username(username).await?;
+        let token = generate_jwt(&user.user_name, user.user_id.unwrap())?;
+        println!("token: {}", token);
+        self.token_repository.create(&token).await?;
+        Ok(())
+    }
+
+    pub async fn verify_password_reset(&self, token: &str) -> Result<()> {
+        self.token_repository.find_by_token(token).await?;
+        decode_jwt(token)?;
+        Ok(())
     }
 }

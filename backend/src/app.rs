@@ -1,5 +1,6 @@
 use crate::db;
 use crate::middleware::mw_require_auth;
+use crate::repository::token_repository::MemTokenRepo;
 use crate::repository::user_repository::PgUserRepo;
 use crate::routes::users::router as users_router;
 use crate::service::UserService;
@@ -13,10 +14,11 @@ use tower_http::cors::{Any, CorsLayer};
 
 // Use this to configure the type of the user repository.
 type UserRepoImpl = PgUserRepo;
+type TokenRepoImpl = MemTokenRepo;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub user_service: UserService<UserRepoImpl>,
+    pub user_service: UserService<UserRepoImpl, TokenRepoImpl>,
 }
 
 fn api_router() -> Router<AppState> {
@@ -29,7 +31,8 @@ fn api_router() -> Router<AppState> {
 pub async fn app() -> Router {
     let pool = db::db_pool().await.unwrap();
     let user_repo = UserRepoImpl::new(pool);
-    let user_service = UserService::new(user_repo);
+    let token_repo = TokenRepoImpl::new();
+    let user_service = UserService::new(user_repo, token_repo);
     let app_state = AppState { user_service };
     Router::new()
         .route("/", get(probe))
