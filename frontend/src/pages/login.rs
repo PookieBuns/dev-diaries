@@ -64,14 +64,28 @@ pub fn Login() -> impl IntoView {
         view! {
             <Alert message=alert_message visible=alert_visible/>
             <form on:submit=handle_submit>
-                <input required=true type="text" placeholder="Username" node_ref=user_name/>
-                <input required=true type="password" placeholder="Password" node_ref=password/>
-                <button type="submit">Login</button>
+                <input
+                    class="form-control"
+                    required=true
+                    type="text"
+                    placeholder="Username"
+                    node_ref=user_name
+                />
+                <input
+                    class="form-control"
+                    required=true
+                    type="password"
+                    placeholder="Password"
+                    node_ref=password
+                />
+                <button class="btn btn-primary" type="submit">Login</button>
             </form>
             <A href="/register">Register</A>
         }.into_view()
     }
 }
+
+
 
 
 
