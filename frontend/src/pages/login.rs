@@ -3,6 +3,7 @@ use thiserror::Error;
 use leptos_router::*;
 use crate::wrappers::auth::is_auth;
 use crate::components::Alert;
+use crate::utils::base_url;
 use std::collections::HashMap;
 
 #[derive(Error, Debug)]
@@ -16,7 +17,7 @@ async fn login(username: String, password: String) -> Result<()> {
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post("http://localhost:8081/api/users/login")
+    let res = client.post(base_url() + "/api/users/login")
         .json(&map)
         .send()
         .await?;
@@ -78,12 +79,18 @@ pub fn Login() -> impl IntoView {
                     placeholder="Password"
                     node_ref=password
                 />
-                <button class="btn btn-primary" type="submit">Login</button>
+                <button class="btn btn-primary" type="submit">
+                    Login
+                </button>
             </form>
             <A href="/register">Register</A>
         }.into_view()
     }
 }
+
+
+
+
 
 
 

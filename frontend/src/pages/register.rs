@@ -1,6 +1,7 @@
 use leptos::{error::Result, ev::SubmitEvent, *};
 use thiserror::Error;
 use leptos_router::*;
+use crate::utils::base_url;
 use crate::wrappers::auth::is_auth;
 use crate::components::Alert;
 use std::collections::HashMap;
@@ -16,7 +17,7 @@ async fn register(username: String, password: String) -> Result<()> {
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post("http://localhost:8081/api/users/register")
+    let res = client.post(base_url() + "/api/users/register")
         .json(&map)
         .send()
         .await?;
@@ -72,6 +73,8 @@ pub fn Register() -> impl IntoView {
         }.into_view()
     }
 }
+
+
 
 
 
