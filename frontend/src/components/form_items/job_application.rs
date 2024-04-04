@@ -1,5 +1,5 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
-use serde_json::json;
+use serde_json::{json, Value};
 
 use leptos::*;
 
@@ -20,14 +20,17 @@ impl FormItem for JobApplicationFormItem {
         self.id = id;
     }
 
-    fn data(&self) -> String {
+    fn data(&self) -> Value {
         json!({
             "id": self.id,
             "company_name": self.company_name.get(),
             "link": self.link.get(),
             "is_done": self.is_done.get(),
         })
-        .to_string()
+    }
+
+    fn name() -> &'static str {
+        "Job Application"
     }
 }
 

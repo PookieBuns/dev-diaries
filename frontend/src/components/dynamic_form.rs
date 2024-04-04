@@ -1,4 +1,5 @@
 use leptos::{ev::Event, *};
+use serde_json::Value;
 
 pub fn set_string(signal: RwSignal<String>) -> impl Fn(Event) {
     move |e| signal.set(event_target_value(&e))
@@ -11,11 +12,15 @@ pub fn set_checked(signal: RwSignal<bool>) -> impl Fn(Event) {
 pub trait FormItem: IntoView + Default + Clone + Copy {
     fn id(&self) -> u32;
     fn set_id(&mut self, id: u32);
-    fn data(&self) -> String;
+    fn data(&self) -> Value;
+    fn name() -> &'static str;
 }
 
 #[component]
-pub fn DynamicForm<T: FormItem + 'static>(#[prop(optional)] _dummy: T) -> impl IntoView {
+pub fn DynamicForm<T: FormItem + 'static>(
+    data: RwSignal<Value>,
+    #[prop(optional)] _dummy: T,
+) -> impl IntoView {
     let (form_items, set_form_items) = create_signal(Vec::<T>::new());
     let (id, set_id) = create_signal(0);
     let (log, set_log) = create_signal(String::new());
@@ -31,11 +36,19 @@ pub fn DynamicForm<T: FormItem + 'static>(#[prop(optional)] _dummy: T) -> impl I
         cur_log.push_str("Form Submitted:<br>");
         for form_item in form_items.get() {
             let data = form_item.data();
-            cur_log.push_str(&data);
+            cur_log.push_str(&data.to_string());
             cur_log.push_str("<br>");
         }
         cur_log.push_str("<br>");
         set_log.set(cur_log.to_string());
+        let form_data: Vec<Value> = form_items
+            .get()
+            .iter()
+            .map(|form_item| form_item.data())
+            .collect();
+        data.update(|data| {
+            data[T::name()] = Value::Array(form_data);
+        })
     };
     view! {
         <>
