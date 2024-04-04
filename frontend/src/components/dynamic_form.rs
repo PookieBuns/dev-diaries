@@ -11,6 +11,7 @@ pub fn set_checked(signal: RwSignal<bool>) -> impl Fn(Event) {
 pub trait FormItem: IntoView + Default + Clone + Copy {
     fn id(&self) -> u32;
     fn set_id(&mut self, id: u32);
+    fn data(&self) -> String;
 }
 
 #[component]
@@ -28,7 +29,11 @@ pub fn DynamicForm<T: FormItem + 'static>(#[prop(optional)] _dummy: T) -> impl I
         // let mut cur_log = log.get();
         let mut cur_log = String::new();
         cur_log.push_str("Form Submitted:<br>");
-
+        for form_item in form_items.get() {
+            let data = form_item.data();
+            cur_log.push_str(&data);
+            cur_log.push_str("<br>");
+        }
         cur_log.push_str("<br>");
         set_log.set(cur_log.to_string());
     };
