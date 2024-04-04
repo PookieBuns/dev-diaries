@@ -63,30 +63,51 @@ pub fn Login() -> impl IntoView {
         view! { <></> }.into_view()
     } else {
         view! {
-            <Alert message=alert_message visible=alert_visible/>
-            <form on:submit=handle_submit>
-                <input
-                    class="form-control"
-                    required=true
-                    type="text"
-                    placeholder="Username"
-                    node_ref=user_name
-                />
-                <input
-                    class="form-control"
-                    required=true
-                    type="password"
-                    placeholder="Password"
-                    node_ref=password
-                />
-                <button class="btn btn-primary" type="submit">
-                    Login
-                </button>
-            </form>
-            <A href="/register">Register</A>
+            <div class="container">
+                <div class="row justify-content-center mt-5">
+                    <div class="col-md-6 col-lg-4 text-center">
+                        <Alert message=alert_message visible=alert_visible/>
+                        <form on:submit=handle_submit>
+                            <div class="mb-3">
+                                <input
+                                    class="form-control"
+                                    required=true
+                                    type="text"
+                                    placeholder="Username"
+                                    node_ref=user_name
+                                />
+                            </div>
+                            <div class="mb-3">
+                                <input
+                                    class="form-control"
+                                    required=true
+                                    type="password"
+                                    placeholder="Password"
+                                    node_ref=password
+                                />
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" type="submit">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+                        <A href="/register">Register</A>
+                    </div>
+                </div>
+            </div>
         }.into_view()
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 
