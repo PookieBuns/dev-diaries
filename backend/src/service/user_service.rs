@@ -33,6 +33,9 @@ where
             user_id: None,
             user_name: username.to_string(),
             password: password_hash,
+            created_at: None,
+            updated_at: None,
+            deleted_at: None,
         };
         self.user_repository.create(&user).await?;
         Ok(())
