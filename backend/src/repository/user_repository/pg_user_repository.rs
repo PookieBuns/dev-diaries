@@ -2,7 +2,7 @@ use super::UserRepo;
 use crate::model::User;
 use crate::Result;
 use axum::async_trait;
-use sqlx::PgPool;
+use sqlx::{Execute, PgPool, QueryBuilder};
 
 #[derive(Clone)]
 pub struct PgUserRepo {
@@ -18,6 +18,7 @@ impl PgUserRepo {
 #[async_trait]
 impl UserRepo for PgUserRepo {
     async fn find_by_username(&self, username: &str) -> Result<User> {
+        // can't use compile time check because query_as! doesn't support FromRow
         let user: User = sqlx::query_as("SELECT * FROM \"user\" WHERE user_name = $1")
             .bind(username)
             .fetch_one(&self.pool)
@@ -26,13 +27,12 @@ impl UserRepo for PgUserRepo {
     }
 
     async fn create(&self, user: &User) -> Result<()> {
-        sqlx::query(
-            "INSERT INTO \"user\" (user_name, password_hash, salt)
-        VALUES ($1, $2, $3)",
+        sqlx::query!(
+            "INSERT INTO \"user\" (user_name, password_hash, salt) VALUES ($1, $2, $3)",
+            user.user_name,
+            &user.password.hash,
+            &user.password.salt,
         )
-        .bind(&user.user_name)
-        .bind(user.password.hash)
-        .bind(user.password.salt)
         .execute(&self.pool)
         .await?;
         Ok(())
