@@ -2,7 +2,7 @@ use super::UserRepo;
 use crate::model::User;
 use crate::Result;
 use axum::async_trait;
-use sqlx::{Execute, PgPool, QueryBuilder};
+use sqlx::PgPool;
 
 #[derive(Clone)]
 pub struct PgUserRepo {

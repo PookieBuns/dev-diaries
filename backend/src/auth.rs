@@ -11,12 +11,18 @@ pub const AUTH_TOKEN: &str = "auth-token";
 const EXPIRATION_TIME: i64 = 3600;
 const SECRET_KEY: &str = "MY_SECRET_KEY";
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Claims {
-    sub: String,
+    sub: i32,
     name: String,
     iat: usize,
     exp: usize,
+}
+
+impl Claims {
+    pub fn user_id(&self) -> i32 {
+        self.sub
+    }
 }
 
 pub fn hash_password(password: &str) -> Result<PasswordHash> {
@@ -51,7 +57,7 @@ pub fn generate_jwt(user_name: &str, user_id: i32) -> Result<String> {
     let now = Utc::now().timestamp();
     let exp = now + EXPIRATION_TIME;
     let claims = Claims {
-        sub: user_id.to_string(),
+        sub: user_id,
         name: user_name.to_string(),
         iat: now as usize,
         exp: exp as usize,

@@ -1,4 +1,4 @@
-use crate::auth::AUTH_TOKEN;
+use crate::auth::{AUTH_TOKEN, decode_jwt};
 use crate::errors::Error;
 use crate::Result;
 use axum::http::Request;
@@ -8,11 +8,12 @@ use tower_cookies::Cookies;
 
 pub async fn mw_require_auth<B>(
     cookies: Cookies,
-    req: Request<B>,
+    mut req: Request<B>,
     next: Next<B>,
 ) -> Result<Response> {
     let auth_token = cookies.get(AUTH_TOKEN).map(|c| c.value().to_string());
-    println!("auth_token: {:?}", auth_token);
-    auth_token.ok_or(Error::Auth)?;
+    let jwt = auth_token.ok_or(Error::Auth)?;
+    let claims = decode_jwt(&jwt)?;
+    req.extensions_mut().insert(claims);
     Ok(next.run(req).await)
 }

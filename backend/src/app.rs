@@ -29,9 +29,9 @@ pub struct AppState {
 fn api_router() -> Router<AppState> {
     Router::new()
         .route("/cookies", get(read_cookies))
+        .nest("/diary", diary_router())
         .layer(middleware::from_fn(mw_require_auth))
         .nest("/users", users_router())
-        .nest("/diary", diary_router())
 }
 
 pub async fn app() -> Router {
