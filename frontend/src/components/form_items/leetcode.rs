@@ -23,7 +23,7 @@ impl FormItem for LeetcodeFormItem {
     fn data(&self) -> Value {
         json!({
             "id": self.id,
-            "link": self.link.get(),
+            "problem_link": self.link.get(),
             "difficulty": self.difficulty.get(),
             "is_done": self.is_done.get(),
         })

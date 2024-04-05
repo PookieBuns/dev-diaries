@@ -24,7 +24,7 @@ impl FormItem for JobApplicationFormItem {
         json!({
             "id": self.id,
             "company_name": self.company_name.get(),
-            "link": self.link.get(),
+            "job_application_link": self.link.get(),
             "is_done": self.is_done.get(),
         })
     }
