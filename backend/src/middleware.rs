@@ -1,4 +1,4 @@
-use crate::auth::{AUTH_TOKEN, decode_jwt};
+use crate::auth::{decode_jwt, AUTH_TOKEN};
 use crate::errors::Error;
 use crate::Result;
 use axum::http::Request;
