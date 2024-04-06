@@ -30,6 +30,11 @@ pub fn Navbar() -> impl IntoView {
                             </A>
                         </li>
                         <li class="nav-item">
+                            <A class="nav-link" href="/diaries">
+                                Diaries
+                            </A>
+                        </li>
+                        <li class="nav-item">
                             <A class="nav-link" href="/new">
                                 New Diary
                             </A>
