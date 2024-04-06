@@ -22,7 +22,10 @@ pub fn Navbar() -> impl IntoView {
                 >
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
+                <div
+                    class="collapse navbar-collapse justify-content-between"
+                    id="navbarSupportedContent"
+                >
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <A class="nav-link" href="/home">
