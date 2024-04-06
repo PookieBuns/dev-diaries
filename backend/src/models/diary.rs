@@ -1,8 +1,8 @@
 use chrono::NaiveDate;
-use serde::Deserialize;
-use sqlx::Type;
+use serde::{Deserialize, Serialize};
+use sqlx::{prelude::FromRow, Type};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Diary {
     pub user_id: Option<i32>,
     pub diary_date: Option<NaiveDate>,
@@ -10,7 +10,7 @@ pub struct Diary {
     pub job_applications: Vec<JobApplication>,
 }
 
-#[derive(Debug, Type, Deserialize)]
+#[derive(Debug, Type, Deserialize, Serialize)]
 #[sqlx(type_name = "difficulty_level", rename_all = "lowercase")]
 pub enum DifficultyLevel {
     Easy,
@@ -18,15 +18,17 @@ pub enum DifficultyLevel {
     Hard,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct LeetCodeProblem {
+    pub diary_id: Option<i32>,
     pub problem_link: String,
     pub difficulty: DifficultyLevel,
     pub is_done: bool,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct JobApplication {
+    pub diary_id: Option<i32>,
     pub company_name: String,
     pub job_application_link: String,
     pub is_done: bool,

@@ -25,4 +25,8 @@ where
         self.diary_repository.create(&diary).await?;
         Ok(())
     }
+
+    pub async fn get_diaries(&self, user_id: i32) -> Result<Vec<Diary>> {
+        self.diary_repository.get(user_id).await
+    }
 }

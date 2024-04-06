@@ -1,11 +1,13 @@
 mod models;
 
 use super::DiaryRepo;
+use crate::models::diary::{DifficultyLevel, JobApplication, LeetCodeProblem};
 use crate::models::Diary;
 use crate::Result;
 use axum::async_trait;
-use models::{PgDiary, PgJobApplication, PgLeetCodeProblem};
+use models::PgDiary;
 use sqlx::{PgPool, QueryBuilder, Row};
+use std::collections::HashMap;
 
 #[derive(Clone)]
 pub struct PgDiaryRepo {
@@ -63,10 +65,76 @@ impl DiaryRepo for PgDiaryRepo {
         Ok(())
     }
 
-    async fn get(&self, user_id: i32) -> Result<Diary> {
-        let diaries = sqlx::query_as!(PgDiary, "SELECT * FROM diary WHERE user_id = $1", user_id)
-            .fetch_all(&self.pool)
-            .await?;
-        !todo!()
+    async fn get(&self, user_id: i32) -> Result<Vec<Diary>> {
+        let pg_diaries =
+            sqlx::query_as!(PgDiary, "SELECT * FROM diary WHERE user_id = $1", user_id)
+                .fetch_all(&self.pool)
+                .await?;
+        let diary_ids: Vec<i32> = pg_diaries.iter().map(|diary| diary.diary_id).collect();
+        let mut leet_code_problems = sqlx::query_as!(
+            LeetCodeProblem,
+            r#"
+            SELECT
+                diary_id,
+                problem_link,
+                difficulty as "difficulty: DifficultyLevel",
+                is_done
+            FROM
+                leet_code_problem
+            WHERE
+                diary_id = ANY($1)
+            "#,
+            &diary_ids
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        let mut job_applications = sqlx::query_as!(
+            JobApplication,
+            r#"
+            SELECT
+                diary_id,
+                company_name,
+                job_application_link,
+                is_done
+            FROM
+                job_application
+            WHERE
+                diary_id = ANY($1)
+            "#,
+            &diary_ids
+        )
+        .fetch_all(&self.pool)
+        .await?;
+        let mut lee_code_problems_map: HashMap<i32, Vec<LeetCodeProblem>> = leet_code_problems
+            .into_iter()
+            .fold(HashMap::new(), |mut map, problem| {
+                map.entry(problem.diary_id.unwrap())
+                    .or_default()
+                    .push(problem);
+                map
+            });
+        let mut job_applications_map: HashMap<i32, Vec<JobApplication>> = job_applications
+            .into_iter()
+            .fold(HashMap::new(), |mut map, application| {
+                map.entry(application.diary_id.unwrap())
+                    .or_default()
+                    .push(application);
+                map
+            });
+        let diaries = pg_diaries.into_iter().map(|pg_diary| {
+            let leet_code_problems = lee_code_problems_map
+                .remove(&pg_diary.diary_id)
+                .unwrap_or_default();
+            let job_applications = job_applications_map
+                .remove(&pg_diary.diary_id)
+                .unwrap_or_default();
+            Diary {
+                user_id: Some(pg_diary.user_id),
+                diary_date: Some(pg_diary.diary_date),
+                leet_code_problems,
+                job_applications,
+            }
+        });
+        Ok(diaries.collect())
     }
 }
