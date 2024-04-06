@@ -20,4 +20,3 @@ pub fn Home() -> impl IntoView {
         </div>
     }
 }
-

@@ -1,10 +1,10 @@
-use leptos::{error::Result, ev::SubmitEvent, *};
-use thiserror::Error;
-use leptos_router::*;
+use crate::components::Alert;
 use crate::utils::base_url;
 use crate::wrappers::auth::is_auth;
-use crate::components::Alert;
+use leptos::{error::Result, ev::SubmitEvent, *};
+use leptos_router::*;
 use std::collections::HashMap;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum RegisterError {
@@ -17,7 +17,8 @@ async fn register(username: String, password: String) -> Result<()> {
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post(base_url() + "/api/users/register")
+    let res = client
+        .post(base_url() + "/api/users/register")
         .json(&map)
         .send()
         .await?;
@@ -44,18 +45,16 @@ pub fn Register() -> impl IntoView {
         logging::log!("user_name_value: {}", user_name_value);
         logging::log!("password_value: {}", password_value);
         let navigate = use_navigate();
-        spawn_local(
-            async move {
-                if register(user_name_value, password_value).await.is_ok() {
-                    logging::log!("register success");
-                    navigate("/login", Default::default());
-                } else {
-                    logging::log!("register failed");
-                    set_alert_message.set("register failed".to_string());
-                    set_alert_visible.set(true);
-                }
+        spawn_local(async move {
+            if register(user_name_value, password_value).await.is_ok() {
+                logging::log!("register success");
+                navigate("/login", Default::default());
+            } else {
+                logging::log!("register failed");
+                set_alert_message.set("register failed".to_string());
+                set_alert_visible.set(true);
             }
-        );
+        });
     };
     let navigate = use_navigate();
     if is_auth() {
@@ -70,23 +69,7 @@ pub fn Register() -> impl IntoView {
                 <button type="submit">Register</button>
             </form>
             <A href="/login">Login</A>
-        }.into_view()
+        }
+        .into_view()
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

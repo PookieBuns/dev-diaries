@@ -42,4 +42,3 @@ pub fn RequireAuth() -> impl IntoView {
         view! { <></> }.into_view()
     }
 }
-

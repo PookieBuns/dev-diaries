@@ -57,4 +57,3 @@ impl IntoView for JobApplicationFormItem {
         .into_view()
     }
 }
-

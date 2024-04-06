@@ -57,4 +57,3 @@ pub fn Navbar() -> impl IntoView {
         </nav>
     }
 }
-

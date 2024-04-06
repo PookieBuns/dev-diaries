@@ -17,4 +17,3 @@ pub fn get_local_storage() -> Result<Storage> {
         .ok_or(AuthError::Storage)?;
     Ok(local_storage)
 }
-

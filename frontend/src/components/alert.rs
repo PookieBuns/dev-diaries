@@ -8,4 +8,3 @@ pub fn Alert(message: ReadSignal<String>, visible: ReadSignal<bool>) -> impl Int
         </Show>
     }
 }
-

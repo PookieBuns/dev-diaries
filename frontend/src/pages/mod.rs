@@ -1,11 +1,11 @@
-mod login;
-mod home;
 mod create;
-mod register;
 mod diaries;
+mod home;
+mod login;
+mod register;
 
-pub use login::Login;
-pub use home::Home;
 pub use create::Create;
-pub use register::Register;
 pub use diaries::Diaries;
+pub use home::Home;
+pub use login::Login;
+pub use register::Register;

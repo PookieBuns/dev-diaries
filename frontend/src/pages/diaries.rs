@@ -1,8 +1,8 @@
-use leptos::*;
-use serde_json::Value;
 use crate::utils::base_url;
-use reqwest;
 use leptos::error::Result;
+use leptos::*;
+use reqwest;
+use serde_json::Value;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -13,9 +13,7 @@ pub enum DiariesError {
 
 async fn get_diaries() -> Result<Value> {
     let client = reqwest::Client::new();
-    let res = client.get(base_url() + "/api/diary/get")
-        .send()
-        .await?;
+    let res = client.get(base_url() + "/api/diary/get").send().await?;
     let response_code = res.status();
     let res_json = res.json().await?;
     if !response_code.is_success() {
@@ -27,12 +25,10 @@ async fn get_diaries() -> Result<Value> {
 #[component]
 pub fn Diaries() -> impl IntoView {
     let (diaries, set_diaries) = create_signal(Value::Null);
-    spawn_local(
-        async move {
-            let diaries = get_diaries().await.unwrap_or_default();
-            set_diaries.set(diaries);
-        }
-    );
+    spawn_local(async move {
+        let diaries = get_diaries().await.unwrap_or_default();
+        set_diaries.set(diaries);
+    });
     view! {
         <div>
             <h1>Diaries</h1>
@@ -58,12 +54,3 @@ pub fn Diaries() -> impl IntoView {
         </div>
     }
 }
-
-
-
-
-
-
-
-
-

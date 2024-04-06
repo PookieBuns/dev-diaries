@@ -1,10 +1,10 @@
-use leptos::{error::Result, ev::SubmitEvent, *};
-use thiserror::Error;
-use leptos_router::*;
-use crate::wrappers::auth::is_auth;
 use crate::components::Alert;
 use crate::utils::base_url;
+use crate::wrappers::auth::is_auth;
+use leptos::{error::Result, ev::SubmitEvent, *};
+use leptos_router::*;
 use std::collections::HashMap;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum LoginError {
@@ -17,7 +17,8 @@ async fn login(username: String, password: String) -> Result<()> {
     map.insert("username", username);
     map.insert("password", password);
     let client = reqwest::Client::new();
-    let res = client.post(base_url() + "/api/users/login")
+    let res = client
+        .post(base_url() + "/api/users/login")
         .json(&map)
         .send()
         .await?;
@@ -44,18 +45,16 @@ pub fn Login() -> impl IntoView {
         logging::log!("user_name_value: {}", user_name_value);
         logging::log!("password_value: {}", password_value);
         let navigate = use_navigate();
-        spawn_local(
-            async move {
-                if login(user_name_value, password_value).await.is_ok() {
-                    logging::log!("login success");
-                    navigate("/home", Default::default());
-                } else {
-                    logging::log!("login failed");
-                    set_alert_message.set("login failed".to_string());
-                    set_alert_visible.set(true);
-                }
+        spawn_local(async move {
+            if login(user_name_value, password_value).await.is_ok() {
+                logging::log!("login success");
+                navigate("/home", Default::default());
+            } else {
+                logging::log!("login failed");
+                set_alert_message.set("login failed".to_string());
+                set_alert_visible.set(true);
             }
-        );
+        });
     };
     let navigate = use_navigate();
     if is_auth() {
@@ -96,37 +95,7 @@ pub fn Login() -> impl IntoView {
                     </div>
                 </div>
             </div>
-        }.into_view()
+        }
+        .into_view()
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

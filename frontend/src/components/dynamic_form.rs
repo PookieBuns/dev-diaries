@@ -60,4 +60,3 @@ pub fn DynamicForm<T: FormItem + 'static>(form_items: RwSignal<Vec<T>>) -> impl 
         </>
     }
 }
-

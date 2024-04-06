@@ -5,4 +5,3 @@ pub fn base_url() -> String {
     let location = window.location();
     location.origin().unwrap()
 }
-

@@ -1,12 +1,12 @@
 use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
-use thiserror::Error;
 use crate::components::DynamicForm;
 use crate::components::FormItem;
+use crate::utils::base_url;
+use leptos::error::Result;
 use leptos::*;
 use logging;
 use serde_json::{json, Value};
-use crate::utils::base_url;
-use leptos::error::Result;
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum CreateError {
@@ -21,7 +21,8 @@ struct Form {
 
 async fn create_diary(json_data: Value) -> Result<()> {
     let client = reqwest::Client::new();
-    let res = client.post(base_url() + "/api/diary/create")
+    let res = client
+        .post(base_url() + "/api/diary/create")
         .json(&json_data)
         .send()
         .await?;
@@ -42,22 +43,29 @@ pub fn Create() -> impl IntoView {
     };
     let handle_submit = move |_| {
         let mut json_data = json!({});
-        let leetcode_data = form_data.leetcode.get().iter().map(|item| item.data()).collect::<Vec<Value>>();
-        let job_application_data = form_data.job_application.get().iter().map(|item| item.data()).collect::<Vec<Value>>();
+        let leetcode_data = form_data
+            .leetcode
+            .get()
+            .iter()
+            .map(|item| item.data())
+            .collect::<Vec<Value>>();
+        let job_application_data = form_data
+            .job_application
+            .get()
+            .iter()
+            .map(|item| item.data())
+            .collect::<Vec<Value>>();
         json_data["leet_code_problems"] = json!(leetcode_data);
         json_data["job_applications"] = json!(job_application_data);
         json_data["user_id"] = json!(1); // TODO: [1] get user id from session
         logging::log!("{}", json_data.to_string());
-        spawn_local(
-            async move {
-                if create_diary(json_data).await.is_ok() {
-                    logging::log!("create diary success");
-                } else {
-                    logging::log!("create diary failed");
-                }
+        spawn_local(async move {
+            if create_diary(json_data).await.is_ok() {
+                logging::log!("create diary success");
+            } else {
+                logging::log!("create diary failed");
             }
-        )
-
+        })
     };
     view! {
         <div>
@@ -70,6 +78,3 @@ pub fn Create() -> impl IntoView {
         <button on:click=handle_submit>"Log Data"</button>
     }
 }
-
-
-

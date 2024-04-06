@@ -1,4 +1,4 @@
-use crate::pages::{Home, Login, Create, Register, Diaries};
+use crate::pages::{Create, Diaries, Home, Login, Register};
 use crate::wrappers::{Layout, RequireAuth};
 use leptos::*;
 use leptos_router::*;
@@ -25,4 +25,3 @@ pub fn App() -> impl IntoView {
         </Router>
     }
 }
-
