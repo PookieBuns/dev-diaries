@@ -1,7 +1,10 @@
+mod models;
+
 use super::DiaryRepo;
-use crate::model::{Diary, DiaryDB, JobApplicationDB, LeetCodeProblemDB};
+use crate::models::Diary;
 use crate::Result;
 use axum::async_trait;
+use models::{PgDiary, PgJobApplication, PgLeetCodeProblem};
 use sqlx::{PgPool, QueryBuilder, Row};
 
 #[derive(Clone)]
@@ -58,5 +61,12 @@ impl DiaryRepo for PgDiaryRepo {
         }
         transaction.commit().await?;
         Ok(())
+    }
+
+    async fn get(&self, user_id: i32) -> Result<Diary> {
+        let diaries = sqlx::query_as!(PgDiary, "SELECT * FROM diary WHERE user_id = $1", user_id)
+            .fetch_all(&self.pool)
+            .await?;
+        !todo!()
     }
 }

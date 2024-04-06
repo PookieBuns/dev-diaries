@@ -3,7 +3,7 @@ mod auth;
 mod db;
 mod errors;
 mod middleware;
-mod model;
+mod models;
 mod password_recovery;
 mod repository;
 mod routes;

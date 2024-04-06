@@ -1,6 +1,6 @@
 use crate::auth::{decode_jwt, generate_jwt, hash_password, verify_password};
 use crate::errors::Error;
-use crate::model::User;
+use crate::models::User;
 use crate::repository::token_repository::TokenRepo;
 use crate::repository::user_repository::UserRepo;
 use crate::Result;

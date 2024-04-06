@@ -1,4 +1,4 @@
-use crate::model::Diary;
+use crate::models::Diary;
 use crate::repository::diary_repository::DiaryRepo;
 use crate::Result;
 

@@ -1,6 +1,6 @@
 use crate::app::AppState;
 use crate::auth::Claims;
-use crate::model::Diary;
+use crate::models::diary::Diary;
 use crate::Result;
 use axum::extract::{Extension, State};
 use axum::http::StatusCode;

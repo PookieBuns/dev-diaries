@@ -1,6 +1,6 @@
 mod pg_user_repository;
 
-use crate::model::User;
+use crate::models::User;
 use crate::Result;
 use axum::async_trait;
 pub use pg_user_repository::PgUserRepo;

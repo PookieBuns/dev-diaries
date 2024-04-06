@@ -1,4 +1,4 @@
-use crate::model::PasswordHash;
+use crate::models::user::PasswordHash;
 use crate::Result;
 use chrono::Utc;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};

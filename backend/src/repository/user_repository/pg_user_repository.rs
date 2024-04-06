@@ -1,5 +1,5 @@
 use super::UserRepo;
-use crate::model::User;
+use crate::models::User;
 use crate::Result;
 use axum::async_trait;
 use sqlx::PgPool;
