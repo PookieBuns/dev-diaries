@@ -129,6 +129,7 @@ impl DiaryRepo for PgDiaryRepo {
                 .remove(&pg_diary.diary_id)
                 .unwrap_or_default();
             Diary {
+                diary_id: Some(pg_diary.diary_id),
                 user_id: Some(pg_diary.user_id),
                 diary_date: Some(pg_diary.diary_date),
                 leet_code_problems,

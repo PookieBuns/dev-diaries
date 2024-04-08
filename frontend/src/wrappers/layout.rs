@@ -7,7 +7,10 @@ pub fn Layout() -> impl IntoView {
     view! {
         <>
             <Navbar/>
-            <Outlet/>
+            <div class="container">
+                <Outlet/>
+            </div>
         </>
     }
 }
+

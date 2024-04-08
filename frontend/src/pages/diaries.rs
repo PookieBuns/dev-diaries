@@ -23,6 +23,40 @@ async fn get_diaries() -> Result<Value> {
 }
 
 #[component]
+pub fn DiaryCard(diary_data: Value) -> impl IntoView {
+    view! {
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5>{diary_data["diary_date"].as_str().unwrap().to_owned()}</h5>
+            // <p>{diary_data.to_string()}</p>
+            </div>
+            <div class="card-header">LeetCode Problems</div>
+            <ul class="list-group list-group-flush">
+                {diary_data["leet_code_problems"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|problem| {
+                        view! { <li class="list-group-item">{problem.to_string()}</li> }
+                    })
+                    .collect_view()}
+            </ul>
+            <div class="card-header">Job Applications</div>
+            <ul class="list-group list-group-flush">
+                {diary_data["job_applications"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|problem| {
+                        view! { <li class="list-group-item">{problem.to_string()}</li> }
+                    })
+                    .collect_view()}
+            </ul>
+        </div>
+    }
+}
+
+#[component]
 pub fn Diaries() -> impl IntoView {
     let (diaries, set_diaries) = create_signal(Value::Null);
     spawn_local(async move {
@@ -30,27 +64,37 @@ pub fn Diaries() -> impl IntoView {
         set_diaries.set(diaries);
     });
     view! {
-        <div>
-            <h1>Diaries</h1>
-            <p>Welcome to the diaries page!</p>
-            <p>Here are your diaries:</p>
-            {move || {
-                if let Value::Array(diaries) = diaries.get() {
-                    view! {
-                        <ul>
-                            {diaries
-                                .iter()
-                                .map(|diary| view! { <li>{diary.to_string()}</li> })
-                                .collect_view()}
+        <h1>Diaries</h1>
+        <p>Welcome to the diaries page!</p>
+        <p>Here are your diaries:</p>
+        {move || {
+            if let Value::Array(diaries) = diaries.get() {
+                view! {
+                    <ul class="px-0">
+                        {diaries
+                            .into_iter()
+                            .map(|diary| {
+                                view! { <DiaryCard diary_data=diary/> }
+                            })
+                            .collect_view()}
 
-                        </ul>
-                    }
-                        .into_view()
-                } else {
-                    view! { <p>"No diaries found"</p> }.into_view()
+                    </ul>
                 }
-            }}
-
-        </div>
+                    .into_view()
+            } else {
+                view! { <p>"No diaries found"</p> }.into_view()
+            }
+        }}
     }
 }
+
+
+
+
+
+
+
+
+
+
+
