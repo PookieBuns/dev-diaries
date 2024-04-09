@@ -23,35 +23,50 @@ async fn get_diaries() -> Result<Value> {
 }
 
 #[component]
+fn DiaryArray(arr: Vec<Value>) -> impl IntoView {
+    view! {
+        <ul class="list-group list-group-flush">
+            {arr
+                .iter()
+                .map(|item| {
+                    view! {
+                        <li class="list-group-item">
+                            <div class="row">
+                                {item
+                                    .as_object()
+                                    .unwrap()
+                                    .iter()
+                                    .map(|(key, value)| {
+                                        view! {
+                                            <div class="col-3">
+                                                <strong>{key}</strong>
+                                                :
+                                                {" "}
+                                                {value.to_string()}
+                                            </div>
+                                        }
+                                    })
+                                    .collect_view()}
+                            </div>
+                        </li>
+                    }
+                })
+                .collect_view()}
+        </ul>
+    }
+}
+
+#[component]
 pub fn DiaryCard(diary_data: Value) -> impl IntoView {
     view! {
         <div class="card mb-3">
             <div class="card-header">
                 <h5>{diary_data["diary_date"].as_str().unwrap().to_owned()}</h5>
-            // <p>{diary_data.to_string()}</p>
             </div>
             <div class="card-header">LeetCode Problems</div>
-            <ul class="list-group list-group-flush">
-                {diary_data["leet_code_problems"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .map(|problem| {
-                        view! { <li class="list-group-item">{problem.to_string()}</li> }
-                    })
-                    .collect_view()}
-            </ul>
+            <DiaryArray arr=diary_data["leet_code_problems"].as_array().unwrap().to_owned()/>
             <div class="card-header">Job Applications</div>
-            <ul class="list-group list-group-flush">
-                {diary_data["job_applications"]
-                    .as_array()
-                    .unwrap()
-                    .iter()
-                    .map(|problem| {
-                        view! { <li class="list-group-item">{problem.to_string()}</li> }
-                    })
-                    .collect_view()}
-            </ul>
+            <DiaryArray arr=diary_data["job_applications"].as_array().unwrap().to_owned()/>
         </div>
     }
 }
@@ -87,6 +102,18 @@ pub fn Diaries() -> impl IntoView {
         }}
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

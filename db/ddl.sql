@@ -1,3 +1,11 @@
+-- Drop Tables and Types
+DROP TABLE IF EXISTS "job_application";
+DROP TABLE IF EXISTS "leet_code_problem";
+DROP TABLE IF EXISTS "diary";
+DROP TABLE IF EXISTS "user";
+DROP TYPE IF EXISTS difficulty_level;
+
+-- Create Tables and Types
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
