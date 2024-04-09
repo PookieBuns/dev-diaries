@@ -3,7 +3,9 @@ use crate::components::DynamicForm;
 use crate::components::FormItem;
 use crate::utils::base_url;
 use leptos::error::Result;
+use leptos::ev::SubmitEvent;
 use leptos::*;
+use leptos_router::*;
 use logging;
 use serde_json::{json, Value};
 use thiserror::Error;
@@ -41,7 +43,10 @@ pub fn Create() -> impl IntoView {
         leetcode: RwSignal::new(vec![]),
         job_application: RwSignal::new(vec![]),
     };
-    let handle_submit = move |_| {
+    let handle_submit = move |ev: SubmitEvent| {
+        logging::log!("submit");
+        ev.prevent_default();
+        let navigate = use_navigate();
         let mut json_data = json!({});
         let leetcode_data = form_data
             .leetcode
@@ -62,19 +67,22 @@ pub fn Create() -> impl IntoView {
         spawn_local(async move {
             if create_diary(json_data).await.is_ok() {
                 logging::log!("create diary success");
+                navigate("/home", Default::default());
             } else {
                 logging::log!("create diary failed");
             }
         })
     };
     view! {
-        <div>
+        <form on:submit=handle_submit>
             <h1>"Create"</h1>
             <h2>"Leetcode"</h2>
             <DynamicForm<LeetcodeFormItem > form_items=form_data.leetcode/>
             <h2>"Job Application"</h2>
             <DynamicForm<JobApplicationFormItem> form_items=form_data.job_application/>
-        </div>
-        <button on:click=handle_submit>"Log Data"</button>
+            <div class="d-grid">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+        </form>
     }
 }

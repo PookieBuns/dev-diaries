@@ -37,22 +37,37 @@ impl FormItem for JobApplicationFormItem {
 impl IntoView for JobApplicationFormItem {
     fn into_view(self) -> View {
         view! {
-            <>
-                <a>{self.id}</a>
+            <div class="col">
+                // <a>{self.id}</a>
                 <input
+                    class="form-control"
+                    required
                     type="text"
                     placeholder="company name"
                     on:input=set_string(self.company_name)
                     prop:value=self.company_name
                 />
+            </div>
+            <div class="col">
                 <input
+                    class="form-control"
                     type="text"
                     placeholder="link"
                     on:input=set_string(self.link)
                     prop:value=self.link
                 />
-                <input type="checkbox" on:input=set_checked(self.is_done) checked=self.is_done/>
-            </>
+            </div>
+            <div class="col">
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        on:input=set_checked(self.is_done)
+                        checked=self.is_done
+                    />
+                    <label class="form-check-label">"Done"</label>
+                </div>
+            </div>
         }
         .into_view()
     }

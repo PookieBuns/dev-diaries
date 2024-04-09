@@ -48,23 +48,40 @@ impl Default for LeetcodeFormItem {
 impl IntoView for LeetcodeFormItem {
     fn into_view(self) -> View {
         view! {
-            <>
-                <a>{self.id}</a>
+            <div class="col">
                 <input
+                    class="form-control"
+                    required
                     type="text"
                     placeholder="link"
                     on:input=set_string(self.link)
                     prop:value=self.link
                 />
-                <select on:input=set_string(self.difficulty) prop:value=self.difficulty>
+            </div>
+            <div class="col">
+                <select
+                    class="form-select"
+                    on:input=set_string(self.difficulty)
+                    prop:value=self.difficulty
+                >
                     <option value="Easy">"Easy"</option>
                     <option value="Medium" selected>
                         "Medium"
                     </option>
                     <option value="Hard">"Hard"</option>
                 </select>
-                <input type="checkbox" on:input=set_checked(self.is_done) checked=self.is_done/>
-            </>
+            </div>
+            <div class="col">
+                <div class="form-check">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        on:input=set_checked(self.is_done)
+                        checked=self.is_done
+                    />
+                    <label class="form-check-label">"Done"</label>
+                </div>
+            </div>
         }
         .into_view()
     }

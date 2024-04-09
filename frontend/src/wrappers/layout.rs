@@ -13,4 +13,3 @@ pub fn Layout() -> impl IntoView {
         </>
     }
 }
-

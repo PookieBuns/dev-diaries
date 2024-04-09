@@ -26,22 +26,34 @@ pub fn DynamicForm<T: FormItem + 'static>(form_items: RwSignal<Vec<T>>) -> impl 
         set_id.update(|id| *id += 1);
     };
     view! {
-        <>
-            <div>
-                {id}
+        <div class="row">
+            <div class="col">
                 <For each=move || form_items.get() key=|form_item| form_item.id() let:form_item>
-                    <div>
-                        {form_item}
-                        <button on:click=move |_| {
-                            form_items
-                                .update(|data| {
-                                    data.retain(|item| item.id() != form_item.id());
-                                });
-                        }>"Delete"</button>
+                    <div class="row mb-3">
+                        {form_item} <div class="col">
+                            <button
+                                type="button"
+                                class="btn btn-danger"
+                                on:click=move |_| {
+                                    logging::log!("delete form item: {}", form_item.id());
+                                    form_items
+                                        .update(|data| {
+                                            data.retain(|item| item.id() != form_item.id());
+                                        });
+                                }
+                            >
+
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 </For>
             </div>
-            <button on:click=add_form_item>"Add"</button>
-        </>
+        </div>
+        <div class="d-grid mb-3">
+            <button type="button" class="btn btn-secondary" on:click=add_form_item>
+                Add
+            </button>
+        </div>
     }
 }
