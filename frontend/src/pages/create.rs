@@ -1,6 +1,7 @@
 use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
 use crate::components::DynamicForm;
 use crate::components::FormItem;
+use crate::components::MarkdownInput;
 use crate::utils::base_url;
 use leptos::error::Result;
 use leptos::ev::SubmitEvent;
@@ -75,11 +76,13 @@ pub fn Create() -> impl IntoView {
     };
     view! {
         <form on:submit=handle_submit>
-            <h1>"Create"</h1>
-            <h2>"Leetcode"</h2>
+            <h1>Create</h1>
+            <h2>Leetcode</h2>
             <DynamicForm<LeetcodeFormItem > form_items=form_data.leetcode/>
             <h2>"Job Application"</h2>
             <DynamicForm<JobApplicationFormItem> form_items=form_data.job_application/>
+            <h2>Notes</h2>
+            <MarkdownInput/>
             <div class="d-grid">
                 <button class="btn btn-primary" type="submit">Submit</button>
             </div>
