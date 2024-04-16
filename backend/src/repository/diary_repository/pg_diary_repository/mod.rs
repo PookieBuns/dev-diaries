@@ -2,8 +2,8 @@ mod models;
 
 use super::DiaryRepo;
 use crate::models::diary::UserDiary;
-use crate::models::Diary;
 use crate::models::diary::{DifficultyLevel, JobApplication, LeetCodeProblem};
+use crate::models::Diary;
 use crate::Result;
 use axum::async_trait;
 use models::PgDiary;
