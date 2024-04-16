@@ -70,7 +70,9 @@ pub fn DiaryCard(diary_data: Value) -> impl IntoView {
             <div class="card-header">Notes</div>
             <div class="card-body">
                 <zero-md>
-                    <script type="text/markdown">{diary_data["diary_notes"].as_str().unwrap().to_owned()}</script>
+                    <script type="text/markdown">
+                        {diary_data["diary_notes"].as_str().unwrap().to_owned()}
+                    </script>
                 </zero-md>
             </div>
         </div>
