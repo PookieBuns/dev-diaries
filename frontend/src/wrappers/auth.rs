@@ -4,6 +4,7 @@ use leptos::*;
 use leptos_router::*;
 use serde_json::Value;
 use std::collections::HashMap;
+use std::time::Duration;
 
 pub fn is_auth() -> bool {
     get_claims().is_some()
@@ -34,10 +35,23 @@ pub fn get_claims() -> Option<HashMap<String, Value>> {
 
 #[component]
 pub fn RequireAuth() -> impl IntoView {
-    let navigate = use_navigate();
+    let check_auth = move || {
+        logging::log!("Checking if user is authenticated");
+        if !is_auth() {
+            let navigate = use_navigate();
+            navigate("/login", Default::default());
+        }
+    };
+    let interval_handle = set_interval_with_handle(check_auth, Duration::from_secs(5)).unwrap();
+    on_cleanup(move || {
+        logging::log!("Clearing interval");
+        interval_handle.clear();
+    });
     if is_auth() {
+        logging::log!("User is authenticated");
         view! { <Outlet/> }
     } else {
+        let navigate = use_navigate();
         navigate("/login", Default::default());
         view! { <></> }.into_view()
     }
