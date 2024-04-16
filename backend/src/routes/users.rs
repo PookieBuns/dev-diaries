@@ -78,9 +78,9 @@ async fn jwt(Query(params): Query<QueryParams>) -> Result<impl IntoResponse> {
     match res {
         Ok(_) => println!("jwt: {:?}", res),
         Err(e) => match e {
-            Error::JwtError(jwt_error) => {
+            Error::Jwt(jwt_error) => {
                 println!("jwt_error: {:?}", jwt_error);
-                return Err(Error::JwtError(jwt_error));
+                return Err(Error::Jwt(jwt_error));
             }
             _ => {
                 println!("error: {:?}", e);

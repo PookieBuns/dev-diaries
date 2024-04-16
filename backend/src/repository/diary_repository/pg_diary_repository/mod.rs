@@ -25,7 +25,7 @@ impl DiaryRepo for PgDiaryRepo {
     async fn create(&self, diary: &Diary) -> Result<()> {
         let mut transaction = self.pool.begin().await?;
         let row = sqlx::query(
-            "INSERT INTO \"diary\" (user_id, diary_date)
+            "INSERT INTO diary (user_id, diary_date)
         VALUES ($1, $2) returning diary_id",
         )
         .bind(diary.user_id)
@@ -71,7 +71,7 @@ impl DiaryRepo for PgDiaryRepo {
                 .fetch_all(&self.pool)
                 .await?;
         let diary_ids: Vec<i32> = pg_diaries.iter().map(|diary| diary.diary_id).collect();
-        let mut leet_code_problems = sqlx::query_as!(
+        let leet_code_problems = sqlx::query_as!(
             LeetCodeProblem,
             r#"
             SELECT
@@ -88,7 +88,7 @@ impl DiaryRepo for PgDiaryRepo {
         )
         .fetch_all(&self.pool)
         .await?;
-        let mut job_applications = sqlx::query_as!(
+        let job_applications = sqlx::query_as!(
             JobApplication,
             r#"
             SELECT

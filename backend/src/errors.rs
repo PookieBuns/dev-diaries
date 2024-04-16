@@ -15,17 +15,17 @@ pub enum Error {
 
     // Errors from external crates
     #[error("jwt error: {0}")]
-    JwtError(#[from] jsonwebtoken::errors::Error),
+    Jwt(#[from] jsonwebtoken::errors::Error),
     #[error("sqlx error: {0}")]
-    SqlxError(#[from] sqlx::Error),
+    Sqlx(#[from] sqlx::Error),
     #[error("ring error: {0}")]
-    RingError(#[from] ring::error::Unspecified),
+    Ring(#[from] ring::error::Unspecified),
     #[error("mail error: {0}")]
-    MailError(#[from] lettre::error::Error),
+    Mail(#[from] lettre::error::Error),
     #[error("address error: {0}")]
-    AddressError(#[from] lettre::address::AddressError),
+    Address(#[from] lettre::address::AddressError),
     #[error("smtp error: {0}")]
-    SmtpError(#[from] lettre::transport::smtp::Error),
+    Smtp(#[from] lettre::transport::smtp::Error),
 }
 
 impl IntoResponse for Error {

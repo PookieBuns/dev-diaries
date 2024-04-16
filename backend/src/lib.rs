@@ -4,7 +4,7 @@ mod db;
 mod errors;
 mod middleware;
 mod models;
-mod password_recovery;
+// mod password_recovery;
 mod repository;
 mod routes;
 mod service;

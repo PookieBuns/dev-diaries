@@ -19,7 +19,7 @@ impl PgUserRepo {
 impl UserRepo for PgUserRepo {
     async fn find_by_username(&self, username: &str) -> Result<User> {
         // can't use compile time check because query_as! doesn't support FromRow
-        let user: User = sqlx::query_as(r#"SELECT * FROM "user" WHERE user_name = $1"#)
+        let user: User = sqlx::query_as(r"SELECT * FROM user_account WHERE user_name = $1")
             .bind(username)
             .fetch_one(&self.pool)
             .await?;
@@ -28,7 +28,7 @@ impl UserRepo for PgUserRepo {
 
     async fn create(&self, user: &User) -> Result<()> {
         sqlx::query!(
-            r#"INSERT INTO "user" (user_name, password_hash, salt) VALUES ($1, $2, $3)"#,
+            "INSERT INTO user_account (user_name, password_hash, salt) VALUES ($1, $2, $3)",
             user.user_name,
             &user.password.hash,
             &user.password.salt,

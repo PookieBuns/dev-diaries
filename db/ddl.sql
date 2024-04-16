@@ -1,8 +1,8 @@
 -- Drop Tables and Types
-DROP TABLE IF EXISTS "job_application";
-DROP TABLE IF EXISTS "leet_code_problem";
-DROP TABLE IF EXISTS "diary";
-DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS job_application;
+DROP TABLE IF EXISTS leet_code_problem;
+DROP TABLE IF EXISTS diary;
+DROP TABLE IF EXISTS user_account;
 DROP TYPE IF EXISTS difficulty_level;
 
 -- Create Tables and Types
@@ -15,7 +15,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TABLE
-  "user" (
+  user_account (
     user_id SERIAL PRIMARY KEY,
     user_name TEXT NOT NULL UNIQUE,
     salt BYTEA NOT NULL,
@@ -26,30 +26,30 @@ CREATE TABLE
   );
 
 CREATE TRIGGER update_user_updated_at
-BEFORE UPDATE ON "user"
+BEFORE UPDATE ON user_account
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TABLE
-  "diary" (
+  diary (
     diary_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     diary_date DATE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES "user" (user_id)
+    FOREIGN KEY (user_id) REFERENCES user_account (user_id)
   );
 
 CREATE TRIGGER update_diary_updated_at
-BEFORE UPDATE ON "diary"
+BEFORE UPDATE ON diary
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TYPE difficulty_level AS ENUM ('easy', 'medium', 'hard');
 
 CREATE TABLE
-  "leet_code_problem" (
+  leet_code_problem (
     leet_code_problem_id SERIAL PRIMARY KEY,
     diary_id INT NOT NULL,
     problem_link TEXT NOT NULL,
@@ -58,16 +58,16 @@ CREATE TABLE
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (diary_id) REFERENCES "diary" (diary_id)
+    FOREIGN KEY (diary_id) REFERENCES diary (diary_id)
   );
 
 CREATE TRIGGER update_leet_code_problem_updated_at
-BEFORE UPDATE ON "leet_code_problem"
+BEFORE UPDATE ON leet_code_problem
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TABLE
-  "job_application" (
+  job_application (
     job_application_id SERIAL PRIMARY KEY,
     diary_id INT NOT NULL,
     company_name TEXT NOT NULL,
@@ -76,10 +76,10 @@ CREATE TABLE
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (diary_id) REFERENCES "diary" (diary_id)
+    FOREIGN KEY (diary_id) REFERENCES diary (diary_id)
   );
 
 CREATE TRIGGER update_job_application_updated_at
-BEFORE UPDATE ON "job_application"
+BEFORE UPDATE ON job_application
 FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
