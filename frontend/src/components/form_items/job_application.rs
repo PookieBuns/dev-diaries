@@ -1,7 +1,6 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
 use serde::{Deserialize, Serialize};
 
-
 use leptos::*;
 
 #[derive(Copy, Clone, Default, Deserialize, Serialize)]
