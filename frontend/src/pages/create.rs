@@ -1,7 +1,6 @@
 use crate::api::diary::{create_diary, get_diaries};
 use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
 use crate::components::DynamicForm;
-use crate::components::FormItem;
 use crate::components::MarkdownInput;
 use leptos::ev::SubmitEvent;
 use leptos::*;
@@ -9,6 +8,7 @@ use leptos_router::*;
 use serde_json::{json, Value};
 
 struct Form {
+    id: RwSignal<Option<u64>>,
     leetcode: RwSignal<Vec<LeetcodeFormItem>>,
     job_application: RwSignal<Vec<JobApplicationFormItem>>,
     notes: RwSignal<String>,
@@ -17,6 +17,7 @@ struct Form {
 #[component]
 pub fn Create() -> impl IntoView {
     let form_data = Form {
+        id: RwSignal::new(None),
         leetcode: RwSignal::new(vec![]),
         job_application: RwSignal::new(vec![]),
         notes: RwSignal::new("".to_string()),
@@ -30,18 +31,20 @@ pub fn Create() -> impl IntoView {
             .leetcode
             .get()
             .iter()
-            .map(|item| item.data())
+            .map(|item| serde_json::to_value(item).unwrap())
             .collect::<Vec<Value>>();
         let job_application_data = form_data
             .job_application
             .get()
             .iter()
-            .map(|item| item.data())
+            .map(|item| serde_json::to_value(item).unwrap())
             .collect::<Vec<Value>>();
         json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
         json_data["leet_code_problems"] = json!(leetcode_data);
         json_data["job_applications"] = json!(job_application_data);
         json_data["diary_notes"] = json!(form_data.notes.get());
+        logging::log!("id: {:?}", form_data.id);
+        json_data["diary_id"] = json!(form_data.id);
         logging::log!("{}", json_data.to_string());
         spawn_local(async move {
             if create_diary(json_data).await.is_ok() {
@@ -61,17 +64,19 @@ pub fn Create() -> impl IntoView {
             let today_diary = diaries
                 .iter()
                 .rev()
-                .find(|diary| diary["diary"]["diary_date"].as_str().unwrap() == today);
+                .find(|diary| diary["diary_date"].as_str().unwrap() == today);
             if let Some(today_diary) = today_diary {
-                let today_diary_data = &today_diary["diary"];
                 let leet_code_problems: Vec<LeetcodeFormItem> =
-                    serde_json::from_value(today_diary_data["leet_code_problems"].clone()).unwrap();
+                    serde_json::from_value(today_diary["leet_code_problems"].clone()).unwrap();
                 form_data.leetcode.set(leet_code_problems);
                 let job_applications: Vec<JobApplicationFormItem> =
-                    serde_json::from_value(today_diary_data["job_applications"].clone()).unwrap();
+                    serde_json::from_value(today_diary["job_applications"].clone()).unwrap();
                 form_data.job_application.set(job_applications);
-                let notes = today_diary_data["diary_notes"].as_str().unwrap();
+                let notes = today_diary["diary_notes"].as_str().unwrap();
                 form_data.notes.set(notes.to_string());
+                form_data
+                    .id
+                    .set(Some(today_diary["diary_id"].as_u64().unwrap()));
             }
         }
     });

@@ -1,12 +1,12 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use leptos::*;
 
-#[derive(Copy, Clone, Default, Deserialize)]
+#[derive(Copy, Clone, Default, Deserialize, Serialize)]
 pub struct JobApplicationFormItem {
-    #[serde(alias = "job_application_id")]
+    #[serde(rename = "job_application_id")]
     id: u32,
     company_name: RwSignal<String>,
     job_application_link: RwSignal<String>,
@@ -20,15 +20,6 @@ impl FormItem for JobApplicationFormItem {
 
     fn set_id(&mut self, id: u32) {
         self.id = id;
-    }
-
-    fn data(&self) -> Value {
-        json!({
-            "id": self.id,
-            "company_name": self.company_name.get(),
-            "job_application_link": self.job_application_link.get(),
-            "is_done": self.is_done.get(),
-        })
     }
 
     fn name() -> &'static str {

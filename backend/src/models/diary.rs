@@ -14,6 +14,7 @@ pub struct Diary {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct UserDiary {
     pub user_id: i32,
+    #[serde(flatten)]
     pub diary: Diary,
 }
 

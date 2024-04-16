@@ -7,7 +7,7 @@ use crate::models::Diary;
 use crate::Result;
 use axum::async_trait;
 use models::PgDiary;
-use sqlx::{PgPool, QueryBuilder, Row};
+use sqlx::{PgPool, QueryBuilder};
 use std::collections::HashMap;
 
 #[derive(Clone)]
@@ -26,20 +26,45 @@ impl DiaryRepo for PgDiaryRepo {
     async fn create(&self, user_diary: &UserDiary) -> Result<()> {
         let diary = &user_diary.diary;
         let mut transaction = self.pool.begin().await?;
-        let row = sqlx::query(
-            "INSERT INTO diary (user_id, diary_date, diary_notes)
-        VALUES ($1, $2, $3) returning diary_id",
+
+        // Insert or Update diary
+        let diary_id = match diary.diary_id {
+            None => {
+                sqlx::query!(
+                    "INSERT INTO diary (user_id, diary_date, diary_notes) VALUES ($1, $2, $3) RETURNING diary_id",
+                    user_diary.user_id,
+                    diary.diary_date,
+                    diary.diary_notes
+                )
+                .fetch_one(&mut *transaction)
+                .await?
+                .diary_id
+            },
+            Some(diary_id) => {
+                sqlx::query!(
+                    "UPDATE diary SET diary_date = $1, diary_notes = $2 WHERE diary_id = $3",
+                    diary.diary_date,
+                    diary.diary_notes,
+                    diary_id
+                )
+                .execute(&mut *transaction)
+                .await?;
+                diary_id
+            },
+        };
+
+        // Replace leet_code_problems
+        sqlx::query!(
+            "UPDATE leet_code_problem SET deleted_at = NOW() WHERE diary_id = $1",
+            diary_id
         )
-        .bind(user_diary.user_id)
-        .bind(diary.diary_date)
-        .bind(&diary.diary_notes)
-        .fetch_one(&mut *transaction)
+        .execute(&mut *transaction)
         .await?;
-        let diary_id: i32 = row.get("diary_id");
-        let mut query_builder = QueryBuilder::new(
-            "INSERT INTO leet_code_problem (diary_id, problem_link, difficulty, is_done)",
-        );
+
         if !diary.leet_code_problems.is_empty() {
+            let mut query_builder = QueryBuilder::new(
+                "INSERT INTO leet_code_problem (diary_id, problem_link, difficulty, is_done)",
+            );
             query_builder.push_values(diary.leet_code_problems.iter(), |mut builder, problem| {
                 builder
                     .push_bind(diary_id)
@@ -50,8 +75,16 @@ impl DiaryRepo for PgDiaryRepo {
             let query = query_builder.build();
             query.execute(&mut *transaction).await?;
         }
+        // Replace job_applications
+        sqlx::query!(
+            "UPDATE job_application SET deleted_at = NOW() WHERE diary_id = $1",
+            diary_id
+        )
+        .execute(&mut *transaction)
+        .await?;
+
         if !diary.job_applications.is_empty() {
-            query_builder = QueryBuilder::new(
+            let mut query_builder = QueryBuilder::new(
                 "INSERT INTO job_application (diary_id, company_name, job_application_link, is_done)",
             );
             query_builder.push_values(diary.job_applications.iter(), |mut builder, application| {
@@ -64,15 +97,20 @@ impl DiaryRepo for PgDiaryRepo {
             let query = query_builder.build();
             query.execute(&mut *transaction).await?;
         }
+
+        // Commit transaction
         transaction.commit().await?;
         Ok(())
     }
 
     async fn get(&self, user_id: i32) -> Result<Vec<UserDiary>> {
-        let pg_diaries =
-            sqlx::query_as!(PgDiary, "SELECT * FROM diary WHERE user_id = $1", user_id)
-                .fetch_all(&self.pool)
-                .await?;
+        let pg_diaries = sqlx::query_as!(
+            PgDiary,
+            "SELECT * FROM diary WHERE user_id = $1 AND deleted_at is NULL",
+            user_id
+        )
+        .fetch_all(&self.pool)
+        .await?;
         let diary_ids: Vec<i32> = pg_diaries.iter().map(|diary| diary.diary_id).collect();
         let leet_code_problems = sqlx::query_as!(
             LeetCodeProblem,
@@ -86,7 +124,7 @@ impl DiaryRepo for PgDiaryRepo {
             FROM
                 leet_code_problem
             WHERE
-                diary_id = ANY($1)
+                diary_id = ANY($1) AND deleted_at IS NULL
             "#,
             &diary_ids
         )
@@ -104,7 +142,7 @@ impl DiaryRepo for PgDiaryRepo {
             FROM
                 job_application
             WHERE
-                diary_id = ANY($1)
+                diary_id = ANY($1) AND deleted_at IS NULL
             "#,
             &diary_ids
         )

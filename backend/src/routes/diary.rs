@@ -19,6 +19,7 @@ async fn create_diary(
     Extension(claims): Extension<Claims>,
     Json(payload): Json<Diary>,
 ) -> Result<impl IntoResponse> {
+    println!("Creating diary: {:?}", payload);
     let diary_service = &state.diary_service;
     diary_service
         .create_diary(claims.user_id(), payload)

@@ -1,12 +1,11 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
-use serde::Deserialize;
-use serde_json::{json, Value};
+use serde::{Deserialize, Serialize};
 
 use leptos::*;
 
-#[derive(Copy, Clone, Deserialize)]
+#[derive(Copy, Clone, Deserialize, Serialize)]
 pub struct LeetcodeFormItem {
-    #[serde(alias = "leet_code_problem_id")]
+    #[serde(rename = "leet_code_problem_id")]
     id: u32,
     problem_link: RwSignal<String>,
     difficulty: RwSignal<String>,
@@ -20,15 +19,6 @@ impl FormItem for LeetcodeFormItem {
 
     fn set_id(&mut self, id: u32) {
         self.id = id;
-    }
-
-    fn data(&self) -> Value {
-        json!({
-            "id": self.id,
-            "problem_link": self.problem_link.get(),
-            "difficulty": self.difficulty.get(),
-            "is_done": self.is_done.get(),
-        })
     }
 
     fn name() -> &'static str {

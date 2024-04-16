@@ -1,5 +1,4 @@
 use leptos::{ev::Event, *};
-use serde_json::Value;
 
 pub fn set_string(signal: RwSignal<String>) -> impl Fn(Event) {
     move |e| signal.set(event_target_value(&e))
@@ -12,7 +11,6 @@ pub fn set_checked(signal: RwSignal<bool>) -> impl Fn(Event) {
 pub trait FormItem: IntoView + Default + Clone + Copy {
     fn id(&self) -> u32;
     fn set_id(&mut self, id: u32);
-    fn data(&self) -> Value;
     fn name() -> &'static str;
 }
 
