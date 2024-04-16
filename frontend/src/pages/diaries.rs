@@ -94,8 +94,8 @@ pub fn Diaries() -> impl IntoView {
                     <ul class="px-0">
                         {diaries
                             .into_iter()
-                            .map(|diary| {
-                                view! { <DiaryCard diary_data=diary/> }
+                            .map(|mut diary| {
+                                view! { <DiaryCard diary_data=diary["diary"].take()/> }
                             })
                             .collect_view()}
 

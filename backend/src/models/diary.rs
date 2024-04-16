@@ -5,11 +5,16 @@ use sqlx::{prelude::FromRow, Type};
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Diary {
     pub diary_id: Option<i32>,
-    pub user_id: Option<i32>,
-    pub diary_date: Option<NaiveDate>,
+    pub diary_date: NaiveDate,
     pub diary_notes: String,
     pub leet_code_problems: Vec<LeetCodeProblem>,
     pub job_applications: Vec<JobApplication>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UserDiary {
+    pub user_id: i32,
+    pub diary: Diary,
 }
 
 #[derive(Debug, Type, Deserialize, Serialize)]

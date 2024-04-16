@@ -20,11 +20,9 @@ async fn create_diary(
     Json(payload): Json<Diary>,
 ) -> Result<impl IntoResponse> {
     let diary_service = &state.diary_service;
-    let diary = Diary {
-        user_id: Some(claims.user_id()),
-        ..payload
-    };
-    diary_service.create_diary(diary).await?;
+    diary_service
+        .create_diary(claims.user_id(), payload)
+        .await?;
     Ok((StatusCode::OK, "Diary created"))
 }
 

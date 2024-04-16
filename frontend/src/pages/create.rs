@@ -63,6 +63,7 @@ pub fn Create() -> impl IntoView {
             .iter()
             .map(|item| item.data())
             .collect::<Vec<Value>>();
+        json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
         json_data["leet_code_problems"] = json!(leetcode_data);
         json_data["job_applications"] = json!(job_application_data);
         json_data["diary_notes"] = json!(form_data.notes.get());

@@ -1,8 +1,9 @@
 mod models;
 
 use super::DiaryRepo;
-use crate::models::diary::{DifficultyLevel, JobApplication, LeetCodeProblem};
+use crate::models::diary::UserDiary;
 use crate::models::Diary;
+use crate::models::diary::{DifficultyLevel, JobApplication, LeetCodeProblem};
 use crate::Result;
 use axum::async_trait;
 use models::PgDiary;
@@ -22,13 +23,14 @@ impl PgDiaryRepo {
 
 #[async_trait]
 impl DiaryRepo for PgDiaryRepo {
-    async fn create(&self, diary: &Diary) -> Result<()> {
+    async fn create(&self, user_diary: &UserDiary) -> Result<()> {
+        let diary = &user_diary.diary;
         let mut transaction = self.pool.begin().await?;
         let row = sqlx::query(
             "INSERT INTO diary (user_id, diary_date, diary_notes)
         VALUES ($1, $2, $3) returning diary_id",
         )
-        .bind(diary.user_id)
+        .bind(user_diary.user_id)
         .bind(diary.diary_date)
         .bind(&diary.diary_notes)
         .fetch_one(&mut *transaction)
@@ -66,7 +68,7 @@ impl DiaryRepo for PgDiaryRepo {
         Ok(())
     }
 
-    async fn get(&self, user_id: i32) -> Result<Vec<Diary>> {
+    async fn get(&self, user_id: i32) -> Result<Vec<UserDiary>> {
         let pg_diaries =
             sqlx::query_as!(PgDiary, "SELECT * FROM diary WHERE user_id = $1", user_id)
                 .fetch_all(&self.pool)
@@ -129,13 +131,16 @@ impl DiaryRepo for PgDiaryRepo {
             let job_applications = job_applications_map
                 .remove(&pg_diary.diary_id)
                 .unwrap_or_default();
-            Diary {
+            let diary = Diary {
                 diary_id: Some(pg_diary.diary_id),
-                user_id: Some(pg_diary.user_id),
-                diary_date: Some(pg_diary.diary_date),
+                diary_date: pg_diary.diary_date,
                 diary_notes: pg_diary.diary_notes,
                 leet_code_problems,
                 job_applications,
+            };
+            UserDiary {
+                user_id: pg_diary.user_id,
+                diary,
             }
         });
         Ok(diaries.collect())

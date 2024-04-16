@@ -1,4 +1,4 @@
-use crate::models::Diary;
+use crate::models::diary::{Diary, UserDiary};
 use crate::repository::diary_repository::DiaryRepo;
 use crate::Result;
 
@@ -18,15 +18,13 @@ where
         Self { diary_repository }
     }
 
-    pub async fn create_diary(&self, mut diary: Diary) -> Result<()> {
-        if diary.diary_date.is_none() {
-            diary.diary_date = Some(chrono::Utc::now().date_naive());
-        }
-        self.diary_repository.create(&diary).await?;
+    pub async fn create_diary(&self, user_id: i32, diary: Diary) -> Result<()> {
+        let user_diary = UserDiary { user_id, diary };
+        self.diary_repository.create(&user_diary).await?;
         Ok(())
     }
 
-    pub async fn get_diaries(&self, user_id: i32) -> Result<Vec<Diary>> {
+    pub async fn get_diaries(&self, user_id: i32) -> Result<Vec<UserDiary>> {
         self.diary_repository.get(user_id).await
     }
 }
