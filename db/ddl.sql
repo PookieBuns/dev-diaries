@@ -35,6 +35,7 @@ CREATE TABLE
     diary_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
     diary_date DATE NOT NULL,
+    diary_notes TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,

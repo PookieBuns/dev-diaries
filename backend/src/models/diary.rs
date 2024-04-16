@@ -7,6 +7,7 @@ pub struct Diary {
     pub diary_id: Option<i32>,
     pub user_id: Option<i32>,
     pub diary_date: Option<NaiveDate>,
+    pub diary_notes: String,
     pub leet_code_problems: Vec<LeetCodeProblem>,
     pub job_applications: Vec<JobApplication>,
 }

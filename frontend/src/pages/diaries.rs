@@ -67,6 +67,12 @@ pub fn DiaryCard(diary_data: Value) -> impl IntoView {
             <DiaryArray arr=diary_data["leet_code_problems"].as_array().unwrap().to_owned()/>
             <div class="card-header">Job Applications</div>
             <DiaryArray arr=diary_data["job_applications"].as_array().unwrap().to_owned()/>
+            <div class="card-header">Notes</div>
+            <div class="card-body">
+                <zero-md>
+                    <script type="text/markdown">{diary_data["diary_notes"].as_str().unwrap().to_owned()}</script>
+                </zero-md>
+            </div>
         </div>
     }
 }

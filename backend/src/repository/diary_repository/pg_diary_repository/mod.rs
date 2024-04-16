@@ -25,11 +25,12 @@ impl DiaryRepo for PgDiaryRepo {
     async fn create(&self, diary: &Diary) -> Result<()> {
         let mut transaction = self.pool.begin().await?;
         let row = sqlx::query(
-            "INSERT INTO diary (user_id, diary_date)
-        VALUES ($1, $2) returning diary_id",
+            "INSERT INTO diary (user_id, diary_date, diary_notes)
+        VALUES ($1, $2, $3) returning diary_id",
         )
         .bind(diary.user_id)
         .bind(diary.diary_date)
+        .bind(&diary.diary_notes)
         .fetch_one(&mut *transaction)
         .await?;
         let diary_id: i32 = row.get("diary_id");
@@ -132,6 +133,7 @@ impl DiaryRepo for PgDiaryRepo {
                 diary_id: Some(pg_diary.diary_id),
                 user_id: Some(pg_diary.user_id),
                 diary_date: Some(pg_diary.diary_date),
+                diary_notes: pg_diary.diary_notes,
                 leet_code_problems,
                 job_applications,
             }

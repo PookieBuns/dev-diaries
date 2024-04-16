@@ -20,6 +20,7 @@ pub enum CreateError {
 struct Form {
     leetcode: RwSignal<Vec<LeetcodeFormItem>>,
     job_application: RwSignal<Vec<JobApplicationFormItem>>,
+    notes: RwSignal<String>,
 }
 
 async fn create_diary(json_data: Value) -> Result<()> {
@@ -43,6 +44,7 @@ pub fn Create() -> impl IntoView {
     let form_data = Form {
         leetcode: RwSignal::new(vec![]),
         job_application: RwSignal::new(vec![]),
+        notes: RwSignal::new("".to_string()),
     };
     let handle_submit = move |ev: SubmitEvent| {
         logging::log!("submit");
@@ -63,7 +65,7 @@ pub fn Create() -> impl IntoView {
             .collect::<Vec<Value>>();
         json_data["leet_code_problems"] = json!(leetcode_data);
         json_data["job_applications"] = json!(job_application_data);
-        json_data["user_id"] = json!(1); // TODO: [1] get user id from session
+        json_data["diary_notes"] = json!(form_data.notes.get());
         logging::log!("{}", json_data.to_string());
         spawn_local(async move {
             if create_diary(json_data).await.is_ok() {
@@ -82,7 +84,7 @@ pub fn Create() -> impl IntoView {
             <h2>"Job Application"</h2>
             <DynamicForm<JobApplicationFormItem> form_items=form_data.job_application/>
             <h2>Notes</h2>
-            <MarkdownInput/>
+            <MarkdownInput value=form_data.notes/>
             <div class="d-grid">
                 <button class="btn btn-primary" type="submit">Submit</button>
             </div>

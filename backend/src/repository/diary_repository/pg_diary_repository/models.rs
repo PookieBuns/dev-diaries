@@ -7,6 +7,7 @@ pub struct PgDiary {
     pub diary_id: i32,
     pub user_id: i32,
     pub diary_date: NaiveDate,
+    pub diary_notes: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
     pub deleted_at: Option<NaiveDateTime>,

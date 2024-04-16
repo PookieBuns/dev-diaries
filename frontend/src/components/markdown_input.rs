@@ -1,10 +1,9 @@
 use leptos::*;
 
 #[component]
-pub fn MarkdownInput() -> impl IntoView {
-    let (value, set_value) = create_signal(String::new());
+pub fn MarkdownInput(value: RwSignal<String>) -> impl IntoView {
     let handle_input = move |e| {
-        set_value.set(event_target_value(&e));
+        value.set(event_target_value(&e));
         logging::log!("value: {}", event_target_value(&e));
     };
     view! {
