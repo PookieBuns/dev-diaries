@@ -1,42 +1,17 @@
+use crate::api::diary::{create_diary, get_diaries};
 use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
 use crate::components::DynamicForm;
 use crate::components::FormItem;
 use crate::components::MarkdownInput;
-use crate::utils::base_url;
-use leptos::error::Result;
 use leptos::ev::SubmitEvent;
 use leptos::*;
 use leptos_router::*;
-use logging;
 use serde_json::{json, Value};
-use thiserror::Error;
-
-#[derive(Error, Debug)]
-pub enum CreateError {
-    #[error("create diary failed")]
-    CreateDiaryFailed,
-}
 
 struct Form {
     leetcode: RwSignal<Vec<LeetcodeFormItem>>,
     job_application: RwSignal<Vec<JobApplicationFormItem>>,
     notes: RwSignal<String>,
-}
-
-async fn create_diary(json_data: Value) -> Result<()> {
-    let client = reqwest::Client::new();
-    let res = client
-        .post(base_url() + "/api/diary/create")
-        .json(&json_data)
-        .send()
-        .await?;
-    let response_code = res.status();
-    if !response_code.is_success() {
-        res.json().await?;
-        return Err(CreateError::CreateDiaryFailed.into());
-    }
-    logging::log!("response_code: {}", response_code);
-    Ok(())
 }
 
 #[component]
@@ -77,6 +52,29 @@ pub fn Create() -> impl IntoView {
             }
         })
     };
+    spawn_local(async move {
+        let diaries = get_diaries().await;
+        if let Ok(diaries) = diaries {
+            logging::log!("{}", diaries.to_string());
+            let diaries = diaries.as_array().unwrap();
+            let today = chrono::Local::now().date_naive().to_string();
+            let today_diary = diaries
+                .iter()
+                .rev()
+                .find(|diary| diary["diary"]["diary_date"].as_str().unwrap() == today);
+            if let Some(today_diary) = today_diary {
+                let today_diary_data = &today_diary["diary"];
+                let leet_code_problems: Vec<LeetcodeFormItem> =
+                    serde_json::from_value(today_diary_data["leet_code_problems"].clone()).unwrap();
+                form_data.leetcode.set(leet_code_problems);
+                let job_applications: Vec<JobApplicationFormItem> =
+                    serde_json::from_value(today_diary_data["job_applications"].clone()).unwrap();
+                form_data.job_application.set(job_applications);
+                let notes = today_diary_data["diary_notes"].as_str().unwrap();
+                form_data.notes.set(notes.to_string());
+            }
+        }
+    });
     view! {
         <form on:submit=handle_submit>
             <h1>Create</h1>

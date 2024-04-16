@@ -1,12 +1,14 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
+use serde::Deserialize;
 use serde_json::{json, Value};
 
 use leptos::*;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Deserialize)]
 pub struct LeetcodeFormItem {
+    #[serde(alias = "leet_code_problem_id")]
     id: u32,
-    link: RwSignal<String>,
+    problem_link: RwSignal<String>,
     difficulty: RwSignal<String>,
     is_done: RwSignal<bool>,
 }
@@ -23,7 +25,7 @@ impl FormItem for LeetcodeFormItem {
     fn data(&self) -> Value {
         json!({
             "id": self.id,
-            "problem_link": self.link.get(),
+            "problem_link": self.problem_link.get(),
             "difficulty": self.difficulty.get(),
             "is_done": self.is_done.get(),
         })
@@ -38,7 +40,7 @@ impl Default for LeetcodeFormItem {
     fn default() -> Self {
         Self {
             id: 0,
-            link: RwSignal::new("".to_string()),
+            problem_link: RwSignal::new("".to_string()),
             difficulty: RwSignal::new("Medium".to_string()),
             is_done: RwSignal::new(false),
         }
@@ -54,8 +56,8 @@ impl IntoView for LeetcodeFormItem {
                     required
                     type="text"
                     placeholder="link"
-                    on:input=set_string(self.link)
-                    prop:value=self.link
+                    on:input=set_string(self.problem_link)
+                    prop:value=self.problem_link
                 />
             </div>
             <div class="col">

@@ -14,7 +14,7 @@ pub fn App() -> impl IntoView {
                             <Route path="home" view=Home/>
                             <Route path="diaries" view=Diaries/>
                             <Route path="new" view=Create/>
-                            <Route path="" view=|| view! { <h1>"c"</h1> }/>
+                            <Route path="" view=|| view! { <h1>There is nothing here</h1> }/>
                         </Route>
                     </Route>
                     <Route path="/login" view=Login/>

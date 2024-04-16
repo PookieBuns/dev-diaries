@@ -1,13 +1,15 @@
 use crate::components::dynamic_form::{set_checked, set_string, FormItem};
+use serde::Deserialize;
 use serde_json::{json, Value};
 
 use leptos::*;
 
-#[derive(Copy, Clone, Default)]
+#[derive(Copy, Clone, Default, Deserialize)]
 pub struct JobApplicationFormItem {
+    #[serde(alias = "job_application_id")]
     id: u32,
     company_name: RwSignal<String>,
-    link: RwSignal<String>,
+    job_application_link: RwSignal<String>,
     is_done: RwSignal<bool>,
 }
 
@@ -24,7 +26,7 @@ impl FormItem for JobApplicationFormItem {
         json!({
             "id": self.id,
             "company_name": self.company_name.get(),
-            "job_application_link": self.link.get(),
+            "job_application_link": self.job_application_link.get(),
             "is_done": self.is_done.get(),
         })
     }
@@ -53,8 +55,8 @@ impl IntoView for JobApplicationFormItem {
                     class="form-control"
                     type="text"
                     placeholder="link"
-                    on:input=set_string(self.link)
-                    prop:value=self.link
+                    on:input=set_string(self.job_application_link)
+                    prop:value=self.job_application_link
                 />
             </div>
             <div class="col">

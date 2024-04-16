@@ -1,26 +1,6 @@
-use crate::utils::base_url;
-use leptos::error::Result;
+use crate::api::diary::get_diaries;
 use leptos::*;
-use reqwest;
 use serde_json::Value;
-use thiserror::Error;
-
-#[derive(Error, Debug)]
-pub enum DiariesError {
-    #[error("Failed to get diaries")]
-    GetDiariesFailed,
-}
-
-async fn get_diaries() -> Result<Value> {
-    let client = reqwest::Client::new();
-    let res = client.get(base_url() + "/api/diary/get").send().await?;
-    let response_code = res.status();
-    let res_json = res.json().await?;
-    if !response_code.is_success() {
-        return Err(DiariesError::GetDiariesFailed.into());
-    }
-    Ok(res_json)
-}
 
 #[component]
 fn DiaryArray(arr: Vec<Value>) -> impl IntoView {
