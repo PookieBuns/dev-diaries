@@ -27,6 +27,7 @@ pub enum DifficultyLevel {
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct LeetCodeProblem {
+    pub leet_code_problem_id: Option<i32>,
     pub diary_id: Option<i32>,
     pub problem_link: String,
     pub difficulty: DifficultyLevel,
@@ -35,6 +36,7 @@ pub struct LeetCodeProblem {
 
 #[derive(Debug, Deserialize, FromRow, Serialize)]
 pub struct JobApplication {
+    pub job_application_id: Option<i32>,
     pub diary_id: Option<i32>,
     pub company_name: String,
     pub job_application_link: String,

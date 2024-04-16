@@ -78,6 +78,7 @@ impl DiaryRepo for PgDiaryRepo {
             LeetCodeProblem,
             r#"
             SELECT
+                leet_code_problem_id,
                 diary_id,
                 problem_link,
                 difficulty as "difficulty: DifficultyLevel",
@@ -95,6 +96,7 @@ impl DiaryRepo for PgDiaryRepo {
             JobApplication,
             r#"
             SELECT
+                job_application_id,
                 diary_id,
                 company_name,
                 job_application_link,
