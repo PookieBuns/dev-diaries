@@ -44,7 +44,7 @@ pub fn RequireAuth() -> impl IntoView {
     };
     let interval_handle = set_interval_with_handle(check_auth, Duration::from_secs(5)).unwrap();
     on_cleanup(move || {
-        logging::log!("Clearing interval");
+        logging::log!("Clearing auth interval");
         interval_handle.clear();
     });
     if is_auth() {

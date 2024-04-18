@@ -4,6 +4,7 @@ use crate::components::MarkdownInput;
 use leptos::ev::SubmitEvent;
 use leptos::*;
 
+#[derive(Clone, Copy)]
 pub struct Form {
     pub id: RwSignal<Option<u64>>,
     pub leetcode: RwSignal<Vec<LeetcodeFormItem>>,
@@ -18,7 +19,6 @@ where
 {
     view! {
         <form on:submit=handle_submit>
-            <h1>Create</h1>
             <h2>Leetcode</h2>
             <DynamicForm<LeetcodeFormItem > form_items=form_data.leetcode/>
             <h2>"Job Application"</h2>

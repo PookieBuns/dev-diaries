@@ -106,7 +106,7 @@ impl DiaryRepo for PgDiaryRepo {
     async fn get(&self, user_id: i32) -> Result<Vec<UserDiary>> {
         let pg_diaries = sqlx::query_as!(
             PgDiary,
-            "SELECT * FROM diary WHERE user_id = $1 AND deleted_at is NULL",
+            "SELECT * FROM diary WHERE user_id = $1 AND deleted_at is NULL order by diary_id",
             user_id
         )
         .fetch_all(&self.pool)
