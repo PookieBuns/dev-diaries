@@ -10,12 +10,38 @@ use std::time::Duration;
 
 #[component]
 pub fn Today() -> impl IntoView {
-    let form_data = Form {
-        id: RwSignal::new(None),
-        leetcode: RwSignal::new(vec![]),
-        job_application: RwSignal::new(vec![]),
-        notes: RwSignal::new("".to_string()),
-    };
+    let form_signal = create_local_resource(
+        || (),
+        |_| async move {
+            let diaries = get_diaries().await;
+            let form = Form {
+                leetcode: create_rw_signal(vec![]),
+                job_application: create_rw_signal(vec![]),
+                notes: create_rw_signal("".to_string()),
+                id: create_rw_signal(None),
+            };
+            if let Ok(diaries) = diaries {
+                logging::log!("{}", diaries.to_string());
+                let diaries = diaries.as_array().unwrap();
+                let today = chrono::Local::now().date_naive().to_string();
+                let today_diary = diaries
+                    .iter()
+                    .find(|diary| diary["diary_date"].as_str().unwrap() == today);
+                if let Some(today_diary) = today_diary {
+                    let leet_code_problems: Vec<LeetcodeFormItem> =
+                        serde_json::from_value(today_diary["leet_code_problems"].clone()).unwrap();
+                    form.leetcode.set(leet_code_problems);
+                    let job_applications: Vec<JobApplicationFormItem> =
+                        serde_json::from_value(today_diary["job_applications"].clone()).unwrap();
+                    form.job_application.set(job_applications);
+                    let notes = today_diary["diary_notes"].as_str().unwrap();
+                    form.notes.set(notes.to_string());
+                    form.id.set(Some(today_diary["diary_id"].as_u64().unwrap()));
+                }
+            }
+            form
+        },
+    );
     let last_update_time =
         RwSignal::new(chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string());
     let save_diary = create_action(|(json_data, redirect): &(Value, bool)| {
@@ -32,23 +58,25 @@ pub fn Today() -> impl IntoView {
     });
     let get_diary_data = move || {
         let mut json_data = json!({});
-        let leetcode_data = form_data
-            .leetcode
-            .get()
-            .iter()
-            .map(|item| serde_json::to_value(item).unwrap())
-            .collect::<Vec<Value>>();
-        let job_application_data = form_data
-            .job_application
-            .get()
-            .iter()
-            .map(|item| serde_json::to_value(item).unwrap())
-            .collect::<Vec<Value>>();
-        json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
-        json_data["leet_code_problems"] = json!(leetcode_data);
-        json_data["job_applications"] = json!(job_application_data);
-        json_data["diary_notes"] = json!(form_data.notes.get());
-        json_data["diary_id"] = json!(form_data.id.get());
+        if let Some(form_data) = form_signal.get() {
+            let leetcode_data = form_data
+                .leetcode
+                .get()
+                .iter()
+                .map(|item| serde_json::to_value(item).unwrap())
+                .collect::<Vec<Value>>();
+            let job_application_data = form_data
+                .job_application
+                .get()
+                .iter()
+                .map(|item| serde_json::to_value(item).unwrap())
+                .collect::<Vec<Value>>();
+            json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
+            json_data["leet_code_problems"] = json!(leetcode_data);
+            json_data["job_applications"] = json!(job_application_data);
+            json_data["diary_notes"] = json!(form_data.notes.get());
+            json_data["diary_id"] = json!(form_data.id.get());
+        }
         json_data
     };
     let handle_submit = move |ev: SubmitEvent| {
@@ -77,33 +105,20 @@ pub fn Today() -> impl IntoView {
         interval_handle.clear();
     });
 
-    spawn_local(async move {
-        let diaries = get_diaries().await;
-        if let Ok(diaries) = diaries {
-            logging::log!("{}", diaries.to_string());
-            let diaries = diaries.as_array().unwrap();
-            let today = chrono::Local::now().date_naive().to_string();
-            let today_diary = diaries
-                .iter()
-                .find(|diary| diary["diary_date"].as_str().unwrap() == today);
-            if let Some(today_diary) = today_diary {
-                let leet_code_problems: Vec<LeetcodeFormItem> =
-                    serde_json::from_value(today_diary["leet_code_problems"].clone()).unwrap();
-                form_data.leetcode.set(leet_code_problems);
-                let job_applications: Vec<JobApplicationFormItem> =
-                    serde_json::from_value(today_diary["job_applications"].clone()).unwrap();
-                form_data.job_application.set(job_applications);
-                let notes = today_diary["diary_notes"].as_str().unwrap();
-                form_data.notes.set(notes.to_string());
-                form_data
-                    .id
-                    .set(Some(today_diary["diary_id"].as_u64().unwrap()));
-            }
-        }
-    });
     view! {
         <h1>Today</h1>
-        <p>"Last updated: "{last_update_time}</p>
-        <DiaryForm form_data=form_data handle_submit=handle_submit/>
+        <p>"Last updated: " {last_update_time}</p>
+        <Suspense fallback=move || {
+            view! { <p>"Loading..."</p> }
+        }>
+            {move || {
+                form_signal
+                    .get()
+                    .map(|form_data| {
+                        view! { <DiaryForm form_data=form_data handle_submit=handle_submit/> }
+                    })
+            }}
+
+        </Suspense>
     }
 }
