@@ -103,7 +103,7 @@ pub fn Today() -> impl IntoView {
     });
     view! {
         <h1>Today</h1>
-        <p>Last updated: {last_update_time}</p>
+        <p>"Last updated: "{last_update_time}</p>
         <DiaryForm form_data=form_data handle_submit=handle_submit/>
     }
 }
