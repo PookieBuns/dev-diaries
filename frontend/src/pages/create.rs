@@ -1,6 +1,5 @@
-use crate::api::diary::{create_diary, get_diaries};
+use crate::api::diary::create_diary;
 use crate::components::diary_form::Form;
-use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
 use crate::components::DiaryForm;
 use leptos::ev::SubmitEvent;
 use leptos::*;
@@ -15,10 +14,19 @@ pub fn Create() -> impl IntoView {
         job_application: RwSignal::new(vec![]),
         notes: RwSignal::new("".to_string()),
     };
-    let handle_submit = move |ev: SubmitEvent| {
-        logging::log!("submit");
-        ev.prevent_default();
+    let save_diary = create_action(|(json_data, redirect): &(Value, bool)| {
         let navigate = use_navigate();
+        let redirect = *redirect;
+        let json_data = json_data.clone();
+        async move {
+            let result = create_diary(json_data).await;
+            if redirect && result.is_ok() {
+                navigate("/home", Default::default());
+            }
+            result
+        }
+    });
+    let get_diary_data = move || {
         let mut json_data = json!({});
         let leetcode_data = form_data
             .leetcode
@@ -36,42 +44,17 @@ pub fn Create() -> impl IntoView {
         json_data["leet_code_problems"] = json!(leetcode_data);
         json_data["job_applications"] = json!(job_application_data);
         json_data["diary_notes"] = json!(form_data.notes.get());
-        logging::log!("id: {:?}", form_data.id);
-        json_data["diary_id"] = json!(form_data.id);
-        logging::log!("{}", json_data.to_string());
-        spawn_local(async move {
-            if create_diary(json_data).await.is_ok() {
-                logging::log!("create diary success");
-                navigate("/home", Default::default());
-            } else {
-                logging::log!("create diary failed");
-            }
-        })
+        json_data["diary_id"] = json!(form_data.id.get());
+        json_data
     };
-    spawn_local(async move {
-        let diaries = get_diaries().await;
-        if let Ok(diaries) = diaries {
-            logging::log!("{}", diaries.to_string());
-            let diaries = diaries.as_array().unwrap();
-            let today = chrono::Local::now().date_naive().to_string();
-            let today_diary = diaries
-                .iter()
-                .rev()
-                .find(|diary| diary["diary_date"].as_str().unwrap() == today);
-            if let Some(today_diary) = today_diary {
-                let leet_code_problems: Vec<LeetcodeFormItem> =
-                    serde_json::from_value(today_diary["leet_code_problems"].clone()).unwrap();
-                form_data.leetcode.set(leet_code_problems);
-                let job_applications: Vec<JobApplicationFormItem> =
-                    serde_json::from_value(today_diary["job_applications"].clone()).unwrap();
-                form_data.job_application.set(job_applications);
-                let notes = today_diary["diary_notes"].as_str().unwrap();
-                form_data.notes.set(notes.to_string());
-                form_data
-                    .id
-                    .set(Some(today_diary["diary_id"].as_u64().unwrap()));
-            }
-        }
-    });
-    view! { <DiaryForm form_data=form_data handle_submit=handle_submit/> }
+    let handle_submit = move |ev: SubmitEvent| {
+        logging::log!("submit");
+        ev.prevent_default();
+        let json_data = get_diary_data();
+        save_diary.dispatch((json_data, true));
+    };
+    view! {
+        <h1>Create</h1>
+        <DiaryForm form_data=form_data handle_submit=handle_submit/>
+    }
 }
