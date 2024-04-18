@@ -1,18 +1,11 @@
 use crate::api::diary::{create_diary, get_diaries};
+use crate::components::diary_form::Form;
 use crate::components::form_items::{JobApplicationFormItem, LeetcodeFormItem};
-use crate::components::DynamicForm;
-use crate::components::MarkdownInput;
+use crate::components::DiaryForm;
 use leptos::ev::SubmitEvent;
 use leptos::*;
 use leptos_router::*;
 use serde_json::{json, Value};
-
-struct Form {
-    id: RwSignal<Option<u64>>,
-    leetcode: RwSignal<Vec<LeetcodeFormItem>>,
-    job_application: RwSignal<Vec<JobApplicationFormItem>>,
-    notes: RwSignal<String>,
-}
 
 #[component]
 pub fn Create() -> impl IntoView {
@@ -80,18 +73,5 @@ pub fn Create() -> impl IntoView {
             }
         }
     });
-    view! {
-        <form on:submit=handle_submit>
-            <h1>Create</h1>
-            <h2>Leetcode</h2>
-            <DynamicForm<LeetcodeFormItem > form_items=form_data.leetcode/>
-            <h2>"Job Application"</h2>
-            <DynamicForm<JobApplicationFormItem> form_items=form_data.job_application/>
-            <h2>Notes</h2>
-            <MarkdownInput value=form_data.notes/>
-            <div class="d-grid">
-                <button class="btn btn-primary" type="submit">Submit</button>
-            </div>
-        </form>
-    }
+    view! { <DiaryForm form_data=form_data handle_submit=handle_submit/> }
 }
