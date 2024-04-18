@@ -4,7 +4,6 @@ use leptos::*;
 pub fn MarkdownInput(value: RwSignal<String>) -> impl IntoView {
     let handle_input = move |e| {
         value.set(event_target_value(&e));
-        logging::log!("value: {}", event_target_value(&e));
     };
     view! {
         <div class="card mb-3">
