@@ -4,7 +4,7 @@ use crate::components::MarkdownInput;
 use leptos::ev::SubmitEvent;
 use leptos::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Form {
     pub id: RwSignal<Option<u64>>,
     pub leetcode: RwSignal<Vec<LeetcodeFormItem>>,

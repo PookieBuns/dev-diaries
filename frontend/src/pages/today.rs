@@ -58,25 +58,27 @@ pub fn Today() -> impl IntoView {
     });
     let get_diary_data = move || {
         let mut json_data = json!({});
-        if let Some(form_data) = form_signal.get() {
-            let leetcode_data = form_data
-                .leetcode
-                .get()
-                .iter()
-                .map(|item| serde_json::to_value(item).unwrap())
-                .collect::<Vec<Value>>();
-            let job_application_data = form_data
-                .job_application
-                .get()
-                .iter()
-                .map(|item| serde_json::to_value(item).unwrap())
-                .collect::<Vec<Value>>();
-            json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
-            json_data["leet_code_problems"] = json!(leetcode_data);
-            json_data["job_applications"] = json!(job_application_data);
-            json_data["diary_notes"] = json!(form_data.notes.get());
-            json_data["diary_id"] = json!(form_data.id.get());
-        }
+        form_signal.with(|maybe_form_data| {
+            if let Some(form_data) = maybe_form_data {
+                let leetcode_data = form_data
+                    .leetcode
+                    .get()
+                    .iter()
+                    .map(|item| serde_json::to_value(item).unwrap())
+                    .collect::<Vec<Value>>();
+                let job_application_data = form_data
+                    .job_application
+                    .get()
+                    .iter()
+                    .map(|item| serde_json::to_value(item).unwrap())
+                    .collect::<Vec<Value>>();
+                json_data["diary_date"] = json!(chrono::Local::now().date_naive().to_string());
+                json_data["leet_code_problems"] = json!(leetcode_data);
+                json_data["job_applications"] = json!(job_application_data);
+                json_data["diary_notes"] = json!(form_data.notes.get());
+                json_data["diary_id"] = json!(form_data.id.get());
+            }
+        });
         json_data
     };
     let handle_submit = move |ev: SubmitEvent| {
@@ -112,12 +114,13 @@ pub fn Today() -> impl IntoView {
             view! { <p>"Loading..."</p> }
         }>
             {move || {
-                form_signal
-                    .get()
-                    .map(|form_data| {
-                        view! { <DiaryForm form_data=form_data handle_submit=handle_submit/> }
-                    })
-            }}
+                form_signal.with(|maybe_form_data| {
+                    maybe_form_data.map(|form_data| {
+                        view! {
+                            <DiaryForm form_data=form_data handle_submit=handle_submit/>
+                        }
+                })
+            })}}
 
         </Suspense>
     }
