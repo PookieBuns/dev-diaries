@@ -7,6 +7,7 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use serde_json::json;
 
 pub fn router() -> Router<AppState> {
     Router::new()
@@ -21,10 +22,11 @@ async fn create_diary(
 ) -> Result<impl IntoResponse> {
     println!("Creating diary: {:?}", payload);
     let diary_service = &state.diary_service;
-    diary_service
+    let diary_id = diary_service
         .create_diary(claims.user_id(), payload)
         .await?;
-    Ok((StatusCode::OK, "Diary created"))
+    let diary_response = json!({ "diary_id": diary_id});
+    Ok((StatusCode::OK, Json(diary_response)))
 }
 
 async fn get_diaries(

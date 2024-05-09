@@ -8,6 +8,6 @@ pub use pg_diary_repository::PgDiaryRepo;
 
 #[async_trait]
 pub trait DiaryRepo {
-    async fn create(&self, diary: &UserDiary) -> Result<()>;
+    async fn create(&self, diary: &UserDiary) -> Result<i32>;
     async fn get(&self, user_id: i32) -> Result<Vec<UserDiary>>;
 }

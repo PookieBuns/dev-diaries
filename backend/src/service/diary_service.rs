@@ -18,10 +18,10 @@ where
         Self { diary_repository }
     }
 
-    pub async fn create_diary(&self, user_id: i32, diary: Diary) -> Result<()> {
+    pub async fn create_diary(&self, user_id: i32, diary: Diary) -> Result<i32> {
         let user_diary = UserDiary { user_id, diary };
-        self.diary_repository.create(&user_diary).await?;
-        Ok(())
+        Ok(self.diary_repository.create(&user_diary).await?)
+
     }
 
     pub async fn get_diaries(&self, user_id: i32) -> Result<Vec<UserDiary>> {

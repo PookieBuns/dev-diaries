@@ -89,8 +89,15 @@ pub fn Today() -> impl IntoView {
     };
     create_effect(move |_| {
         let save_diary_result = save_diary.value().get();
-        if let Some(Ok(_)) = save_diary_result {
+        if let Some(Ok(res_json)) = save_diary_result {
             last_update_time.set(chrono::Local::now().format("%Y-%m-%d %H:%M:%S").to_string());
+            form_signal.with(|maybe_form_data| {
+                if let Some(form_data) = maybe_form_data {
+                    form_data
+                        .id
+                        .set(Some(res_json["diary_id"].as_u64().unwrap()));
+                }
+            })
         }
     });
     let interval_handle = set_interval_with_handle(

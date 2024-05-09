@@ -23,7 +23,7 @@ pub async fn get_diaries() -> Result<Value> {
     Ok(res_json)
 }
 
-pub async fn create_diary(json_data: Value) -> Result<()> {
+pub async fn create_diary(json_data: Value) -> Result<Value> {
     let client = reqwest::Client::new();
     let res = client
         .post(base_url() + "/api/diary/create")
@@ -31,10 +31,10 @@ pub async fn create_diary(json_data: Value) -> Result<()> {
         .send()
         .await?;
     let response_code = res.status();
+    let res_json = res.json().await?;
     if !response_code.is_success() {
-        res.json().await?;
         return Err(DiariesError::CreateDiaryFailed.into());
     }
     logging::log!("response_code: {}", response_code);
-    Ok(())
+    Ok(res_json)
 }

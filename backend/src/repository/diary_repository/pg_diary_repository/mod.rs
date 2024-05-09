@@ -23,7 +23,7 @@ impl PgDiaryRepo {
 
 #[async_trait]
 impl DiaryRepo for PgDiaryRepo {
-    async fn create(&self, user_diary: &UserDiary) -> Result<()> {
+    async fn create(&self, user_diary: &UserDiary) -> Result<i32> {
         let diary = &user_diary.diary;
         let mut transaction = self.pool.begin().await?;
 
@@ -100,7 +100,7 @@ impl DiaryRepo for PgDiaryRepo {
 
         // Commit transaction
         transaction.commit().await?;
-        Ok(())
+        Ok(diary_id)
     }
 
     async fn get(&self, user_id: i32) -> Result<Vec<UserDiary>> {

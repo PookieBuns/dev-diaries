@@ -39,7 +39,7 @@ CREATE TABLE
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES user_account (user_id)
+    FOREIGN KEY (user_id) REFERENCES user_account (user_id) ON DELETE CASCADE
   );
 
 CREATE TRIGGER update_diary_updated_at
@@ -59,7 +59,7 @@ CREATE TABLE
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (diary_id) REFERENCES diary (diary_id)
+    FOREIGN KEY (diary_id) REFERENCES diary (diary_id) ON DELETE CASCADE
   );
 
 CREATE TRIGGER update_leet_code_problem_updated_at
@@ -77,7 +77,7 @@ CREATE TABLE
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP,
-    FOREIGN KEY (diary_id) REFERENCES diary (diary_id)
+    FOREIGN KEY (diary_id) REFERENCES diary (diary_id) ON DELETE CASCADE
   );
 
 CREATE TRIGGER update_job_application_updated_at
