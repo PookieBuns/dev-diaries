@@ -10,6 +10,7 @@ axum = "0.6.20"
 chrono = { version = "0.4.31", features = ["serde"] }
 jsonwebtoken = "9.1.0"
 lettre = "0.11.2"
+reqwest = { version = "0.12.4", features = ["cookies", "json"] }
 ring = "0.17.6"
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"

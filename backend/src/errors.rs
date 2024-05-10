@@ -26,6 +26,8 @@ pub enum Error {
     Address(#[from] lettre::address::AddressError),
     #[error("smtp error: {0}")]
     Smtp(#[from] lettre::transport::smtp::Error),
+    #[error("reqwest error: {0}")]
+    Reqwest(#[from] reqwest::Error),
 }
 
 impl IntoResponse for Error {

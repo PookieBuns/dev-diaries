@@ -4,8 +4,10 @@ use crate::repository::diary_repository::PgDiaryRepo;
 use crate::repository::token_repository::MemTokenRepo;
 use crate::repository::user_repository::PgUserRepo;
 use crate::routes::diary::router as diary_router;
+use crate::routes::leet_code::router as leet_code_router;
 use crate::routes::users::router as users_router;
 use crate::service::DiaryService;
+use crate::service::LeetCodeService;
 use crate::service::UserService;
 use axum::http::StatusCode;
 use axum::middleware;
@@ -24,11 +26,13 @@ type DiaryRepoImpl = PgDiaryRepo;
 pub struct AppState {
     pub user_service: UserService<UserRepoImpl, TokenRepoImpl>,
     pub diary_service: DiaryService<DiaryRepoImpl>,
+    pub leet_code_service: LeetCodeService,
 }
 
 fn api_router() -> Router<AppState> {
     Router::new()
         .route("/cookies", get(read_cookies))
+        .nest("/leet-code", leet_code_router())
         .nest("/diary", diary_router())
         .layer(middleware::from_fn(mw_require_auth))
         .nest("/users", users_router())
@@ -41,9 +45,11 @@ pub async fn app() -> Router {
     let diary_repo = PgDiaryRepo::new(pool.clone());
     let user_service = UserService::new(user_repo, token_repo);
     let diary_service = DiaryService::new(diary_repo);
+    let leet_code_service = LeetCodeService::new();
     let app_state = AppState {
         user_service,
         diary_service,
+        leet_code_service,
     };
     Router::new()
         .route("/", get(probe))

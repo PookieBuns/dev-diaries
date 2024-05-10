@@ -25,7 +25,7 @@ async fn create_diary(
     let diary_id = diary_service
         .create_diary(claims.user_id(), payload)
         .await?;
-    let diary_response = json!({ "diary_id": diary_id});
+    let diary_response = json!({"diary_id": diary_id});
     Ok((StatusCode::OK, Json(diary_response)))
 }
 
