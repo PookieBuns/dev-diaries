@@ -31,3 +31,9 @@ impl LeetCodeService {
         Ok(res.json().await?)
     }
 }
+
+impl Default for LeetCodeService {
+    fn default() -> Self {
+        Self::new()
+    }
+}
