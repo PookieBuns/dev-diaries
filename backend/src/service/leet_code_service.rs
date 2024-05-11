@@ -1,4 +1,4 @@
-use futures::future::try_join_all;
+// use futures::future::try_join_all;
 use futures::StreamExt;
 use futures::TryStreamExt;
 
@@ -40,14 +40,28 @@ where
             .try_collect::<Vec<_>>()
             .await?
             .into_iter()
-            .map(|x| x.submissions)
-            .flatten()
+            .flat_map(|x| x.submissions)
             .collect())
         // Ok(try_join_all(res).await?.into_iter().flatten().collect())
     }
 
     pub async fn get_all_submissions(&self, session_token: &str) -> Result<Vec<Submission>> {
-        let res = self.get_submissions(session_token, 0, 20).await?;
-        Ok(res)
+        let mut offset = 0;
+        let mut limit = offset + 20;
+        let mut submission_list = self
+            .leet_code_repository
+            .get_submissions(session_token, offset, limit)
+            .await?;
+        let mut submissions = submission_list.submissions;
+        while submission_list.has_next {
+            offset = limit;
+            limit = offset + 20;
+            submission_list = self
+                .leet_code_repository
+                .get_submissions(session_token, offset, limit)
+                .await?;
+            submissions.extend(submission_list.submissions);
+        }
+        Ok(submissions)
     }
 }
