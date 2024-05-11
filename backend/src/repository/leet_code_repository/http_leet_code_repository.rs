@@ -1,6 +1,6 @@
 use super::LeetCodeRepo;
 use crate::{
-    models::{LeetCodeSubmissionListResponse, Submission},
+    models::{LeetCodeSubmissionListResponse, SubmissionList},
     Result,
 };
 use axum::async_trait;
@@ -29,7 +29,8 @@ impl LeetCodeRepo for HttpLeetCodeRepo {
         session_token: &str,
         offset: i32,
         limit: i32,
-    ) -> Result<Vec<Submission>> {
+    ) -> Result<SubmissionList> {
+        println!("get_submissions {offset} {limit}");
         let graphql_query = json!({
             "query": format!(r#"{{
                 submissionList(offset: {offset}, limit: {limit}, questionSlug: "") 
@@ -48,7 +49,7 @@ impl LeetCodeRepo for HttpLeetCodeRepo {
             .await?
             .json()
             .await?;
-        Ok(res.data.submission_list.submissions)
+        Ok(res.data.submission_list)
     }
 }
 

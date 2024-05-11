@@ -1,6 +1,6 @@
 mod http_leet_code_repository;
 
-use crate::models::Submission;
+use crate::models::SubmissionList;
 use crate::Result;
 use axum::async_trait;
 pub use http_leet_code_repository::HttpLeetCodeRepo;
@@ -12,5 +12,5 @@ pub trait LeetCodeRepo {
         session_token: &str,
         offset: i32,
         limit: i32,
-    ) -> Result<Vec<Submission>>;
+    ) -> Result<SubmissionList>;
 }

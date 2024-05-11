@@ -10,6 +10,8 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 struct QueryParams {
     session_token: String,
+    offset: Option<i32>,
+    limit: Option<i32>,
 }
 
 pub fn router() -> Router<AppState> {
@@ -22,7 +24,11 @@ async fn get_submissions(
 ) -> Result<impl IntoResponse> {
     let leet_code_service = &state.leet_code_service;
     let submissions = leet_code_service
-        .get_submissions(&query.session_token, 0, 20)
+        .get_submissions(
+            &query.session_token,
+            query.offset.unwrap_or(0),
+            query.limit.unwrap_or(10),
+        )
         .await?;
     Ok((StatusCode::OK, Json(submissions)))
 }
