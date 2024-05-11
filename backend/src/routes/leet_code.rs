@@ -22,7 +22,7 @@ async fn get_submissions(
 ) -> Result<impl IntoResponse> {
     let leet_code_service = &state.leet_code_service;
     let submissions = leet_code_service
-        .get_submissions(&query.session_token)
+        .get_submissions(&query.session_token, 0, 20)
         .await?;
     Ok((StatusCode::OK, Json(submissions)))
 }

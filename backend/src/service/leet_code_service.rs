@@ -1,39 +1,33 @@
+use crate::models::Submission;
+use crate::repository::leet_code_repository::LeetCodeRepo;
 use crate::Result;
-use reqwest::Client;
-use serde_json::{json, Value};
-
-const BASE_URL: &str = "https://leetcode.com/graphql";
 
 #[derive(Clone)]
-pub struct LeetCodeService {
-    client: Client,
+pub struct LeetCodeService<T>
+where
+    T: LeetCodeRepo,
+{
+    leet_code_repository: T,
 }
 
-impl LeetCodeService {
-    pub fn new() -> Self {
+impl<T> LeetCodeService<T>
+where
+    T: LeetCodeRepo,
+{
+    pub fn new(leet_code_repository: T) -> Self {
         Self {
-            client: Client::builder().cookie_store(true).build().unwrap(),
+            leet_code_repository,
         }
     }
 
-    pub async fn get_submissions(&self, session_token: &str) -> Result<Value> {
-        let graphql_query = json!({
-            "query": r#"{ submissionList(offset: 0, limit: 20, questionSlug: "") { hasNext submissions { id lang time timestamp statusDisplay runtime url isPending title memory titleSlug } } }"#,
-        });
-        let cookie = format!("LEETCODE_SESSION={session_token}");
-        let res = self
-            .client
-            .post(BASE_URL)
-            .header("Cookie", cookie)
-            .json(&graphql_query)
-            .send()
-            .await?;
-        Ok(res.json().await?)
-    }
-}
-
-impl Default for LeetCodeService {
-    fn default() -> Self {
-        Self::new()
+    pub async fn get_submissions(
+        &self,
+        session_token: &str,
+        offset: i32,
+        limit: i32,
+    ) -> Result<Vec<Submission>> {
+        self.leet_code_repository
+            .get_submissions(session_token, offset, limit)
+            .await
     }
 }

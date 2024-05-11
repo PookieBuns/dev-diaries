@@ -1,6 +1,7 @@
 use crate::db;
 use crate::middleware::mw_require_auth;
 use crate::repository::diary_repository::PgDiaryRepo;
+use crate::repository::leet_code_repository::HttpLeetCodeRepo;
 use crate::repository::token_repository::MemTokenRepo;
 use crate::repository::user_repository::PgUserRepo;
 use crate::routes::diary::router as diary_router;
@@ -21,20 +22,21 @@ use tower_http::cors::{Any, CorsLayer};
 type UserRepoImpl = PgUserRepo;
 type TokenRepoImpl = MemTokenRepo;
 type DiaryRepoImpl = PgDiaryRepo;
+type LeetCodeRepoImpl = HttpLeetCodeRepo;
 
 #[derive(Clone)]
 pub struct AppState {
     pub user_service: UserService<UserRepoImpl, TokenRepoImpl>,
     pub diary_service: DiaryService<DiaryRepoImpl>,
-    pub leet_code_service: LeetCodeService,
+    pub leet_code_service: LeetCodeService<LeetCodeRepoImpl>,
 }
 
 fn api_router() -> Router<AppState> {
     Router::new()
         .route("/cookies", get(read_cookies))
-        .nest("/leet-code", leet_code_router())
         .nest("/diary", diary_router())
         .layer(middleware::from_fn(mw_require_auth))
+        .nest("/leet-code", leet_code_router())
         .nest("/users", users_router())
 }
 
@@ -43,9 +45,10 @@ pub async fn app() -> Router {
     let user_repo = UserRepoImpl::new(pool.clone());
     let token_repo = TokenRepoImpl::new();
     let diary_repo = PgDiaryRepo::new(pool.clone());
+    let leet_code_repo = HttpLeetCodeRepo::new();
     let user_service = UserService::new(user_repo, token_repo);
     let diary_service = DiaryService::new(diary_repo);
-    let leet_code_service = LeetCodeService::new();
+    let leet_code_service = LeetCodeService::new(leet_code_repo);
     let app_state = AppState {
         user_service,
         diary_service,
