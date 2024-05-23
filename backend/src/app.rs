@@ -28,15 +28,16 @@ type LeetCodeRepoImpl = HttpLeetCodeRepo;
 pub struct AppState {
     pub user_service: UserService<UserRepoImpl, TokenRepoImpl>,
     pub diary_service: DiaryService<DiaryRepoImpl>,
-    pub leet_code_service: LeetCodeService<LeetCodeRepoImpl>,
+    pub leet_code_service: LeetCodeService<LeetCodeRepoImpl, DiaryRepoImpl>,
 }
 
 fn api_router() -> Router<AppState> {
     Router::new()
         .route("/cookies", get(read_cookies))
         .nest("/diary", diary_router())
-        .layer(middleware::from_fn(mw_require_auth))
         .nest("/leet-code", leet_code_router())
+        .layer(middleware::from_fn(mw_require_auth))
+        .route("/ping", get(probe))
         .nest("/users", users_router())
 }
 
@@ -47,8 +48,8 @@ pub async fn app() -> Router {
     let diary_repo = PgDiaryRepo::new(pool.clone());
     let leet_code_repo = HttpLeetCodeRepo::new();
     let user_service = UserService::new(user_repo, token_repo);
-    let diary_service = DiaryService::new(diary_repo);
-    let leet_code_service = LeetCodeService::new(leet_code_repo);
+    let diary_service = DiaryService::new(diary_repo.clone());
+    let leet_code_service = LeetCodeService::new(leet_code_repo, diary_repo.clone());
     let app_state = AppState {
         user_service,
         diary_service,
@@ -64,6 +65,7 @@ pub async fn app() -> Router {
 }
 
 async fn probe() -> &'static str {
+    println!("ping");
     "OK"
 }
 

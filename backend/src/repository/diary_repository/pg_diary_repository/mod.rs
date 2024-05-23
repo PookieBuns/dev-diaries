@@ -4,6 +4,7 @@ use super::DiaryRepo;
 use crate::models::diary::UserDiary;
 use crate::models::diary::{DifficultyLevel, JobApplication, LeetCodeProblem};
 use crate::models::Diary;
+use crate::models::Submission;
 use crate::Result;
 use axum::async_trait;
 use models::PgDiary;
@@ -184,5 +185,48 @@ impl DiaryRepo for PgDiaryRepo {
             }
         });
         Ok(diaries.collect())
+    }
+
+    async fn get_latest_leet_code_submission(&self, user_id: i32) -> Result<i64> {
+        Ok(sqlx::query!(
+            "SELECT MAX(timestamp) as timestamp FROM leet_code_submission WHERE user_id = $1",
+            user_id
+        )
+        .fetch_one(&self.pool)
+        .await?
+        .timestamp
+        .unwrap_or_default())
+    }
+
+    async fn insert_leet_code_submissions(
+        &self,
+        user_id: i32,
+        submissions: &[Submission],
+    ) -> Result<()> {
+        let mut transaction = self.pool.begin().await?;
+        if !submissions.is_empty() {
+            let mut query_builder = QueryBuilder::new(
+                "INSERT INTO leet_code_submission (leet_code_submission_id, user_id, is_pending, lang, memory, runtime, status_display, time, timestamp, title, title_slug, url)",
+            );
+            query_builder.push_values(submissions.iter(), |mut builder, submission| {
+                builder
+                    .push_bind(submission.leet_code_submission_id)
+                    .push_bind(user_id)
+                    .push_bind(&submission.is_pending)
+                    .push_bind(&submission.lang)
+                    .push_bind(&submission.memory)
+                    .push_bind(&submission.runtime)
+                    .push_bind(&submission.status_display)
+                    .push_bind(&submission.time)
+                    .push_bind(submission.timestamp)
+                    .push_bind(&submission.title)
+                    .push_bind(&submission.title_slug)
+                    .push_bind(&submission.url);
+            });
+            let query = query_builder.build();
+            query.execute(&mut *transaction).await?;
+            transaction.commit().await?;
+        }
+        Ok(())
     }
 }

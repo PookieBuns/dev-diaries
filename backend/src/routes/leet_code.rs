@@ -1,6 +1,7 @@
 use crate::app::AppState;
+use crate::auth::Claims;
 use crate::Result;
-use axum::extract::{Query, State};
+use axum::extract::{Extension, Query, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::get;
@@ -18,6 +19,7 @@ pub fn router() -> Router<AppState> {
     Router::new()
         .route("/submissions", get(get_submissions))
         .route("/submissions/all", get(get_all_submissions))
+        .route("/submissions/sync", get(sync_submissions))
 }
 
 async fn get_submissions(
@@ -44,4 +46,16 @@ async fn get_all_submissions(
         .get_all_submissions(&query.session_token)
         .await?;
     Ok((StatusCode::OK, Json(submissions)))
+}
+
+async fn sync_submissions(
+    Query(query): Query<QueryParams>,
+    State(state): State<AppState>,
+    Extension(claims): Extension<Claims>,
+) -> Result<impl IntoResponse> {
+    let leet_code_service = &state.leet_code_service;
+    leet_code_service
+        .sync_submissions(claims.user_id(), &query.session_token)
+        .await?;
+    Ok((StatusCode::OK, "OK"))
 }

@@ -6,6 +6,7 @@ use crate::{
 use axum::async_trait;
 use reqwest::Client;
 use serde_json::json;
+use tracing::info;
 
 const BASE_URL: &str = "https://leetcode.com/graphql";
 
@@ -30,7 +31,7 @@ impl LeetCodeRepo for HttpLeetCodeRepo {
         offset: i32,
         limit: i32,
     ) -> Result<SubmissionList> {
-        println!("get_submissions {offset} {limit}");
+        info!("get_submissions {offset} {limit}");
         let graphql_query = json!({
             "query": format!(r#"{{
                 submissionList(offset: {offset}, limit: {limit}, questionSlug: "") 

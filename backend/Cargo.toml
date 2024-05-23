@@ -14,12 +14,15 @@ lettre = "0.11.2"
 reqwest = { version = "0.12.4", features = ["cookies", "json"] }
 ring = "0.17.6"
 serde = { version = "1.0.192", features = ["derive"] }
+serde-aux = "4.5.0"
 serde_json = "1.0.108"
 sqlx = { version = "0.7.3", features = ["postgres", "runtime-tokio", "chrono", "macros"] }
 thiserror = "1.0.50"
 tokio = { version = "1.33.0", features = ["full"] }
 tower-cookies = "0.9.0"
 tower-http = { version = "0.4.4", features = ["cors"] }
+tracing = "0.1.40"
+tracing-subscriber = "0.3.18"
 url = "2.5.0"
 
 [dev-dependencies]

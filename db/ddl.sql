@@ -96,24 +96,26 @@ EXECUTE PROCEDURE update_updated_at_column();
 
 CREATE TABLE leet_code_submission
 (
-    leet_code_submission_id             BIGSERIAL PRIMARY KEY,
-    is_pending     TEXT      NOT NULL,
-    lang           TEXT      NOT NULL,
-    memory         TEXT,
-    runtime        TEXT,
-    status_display TEXT      NOT NULL,
-    time           TEXT      NOT NULL,
-    timestamp      BIGINT    NOT NULL,
-    title          TEXT      NOT NULL,
-    title_slug     TEXT      NOT NULL,
-    url            TEXT      NOT NULL,
-    created_at     TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at     TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at     TIMESTAMP
+    leet_code_submission_id BIGSERIAL PRIMARY KEY,
+    user_id                 INT       NOT NULL,
+    is_pending              TEXT      NOT NULL,
+    lang                    TEXT      NOT NULL,
+    memory                  TEXT,
+    runtime                 TEXT,
+    status_display          TEXT      NOT NULL,
+    time                    TEXT      NOT NULL,
+    timestamp               BIGINT    NOT NULL,
+    title                   TEXT      NOT NULL,
+    title_slug              TEXT      NOT NULL,
+    url                     TEXT      NOT NULL,
+    created_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at              TIMESTAMP NOT NULL DEFAULT NOW(),
+    deleted_at              TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user_account (user_id) ON DELETE CASCADE
 );
 
 CREATE TRIGGER update_submissions_updated_at
     BEFORE UPDATE
-    ON submissions
+    ON leet_code_submission
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at_column();
